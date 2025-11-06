@@ -9,6 +9,6 @@ public interface CrudDao <T, Id>{
 
     T save(T entity);
 
-    List<T> findByAll(String name);
+    List<T> findByAll(String nameFilter);
 
 }
