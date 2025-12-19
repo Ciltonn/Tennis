@@ -13,33 +13,25 @@ public class MatchImpl implements MatchCrud {
     @Override
     public Optional<Match> findById(Long id) {
 
-        Session session = HibernateUtil.getSessionFactory().openSession();
-
-        try {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             Match findingMatch = session.get(Match.class, id);
             return Optional.ofNullable(findingMatch);
         } catch (Exception e) {
             return Optional.empty();
-        } finally {
-            session.close();
         }
     }
 
     @Override
     public Match save(Match match) {
-        Session session = HibernateUtil.getSessionFactory().openSession();
-        Transaction transaction = null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            Transaction transaction = session.beginTransaction();
+            try {
+                session.persist(match);
+                transaction.commit();
 
-        try {
-            transaction = session.beginTransaction();
-            session.saveOrUpdate(match);
-            transaction.commit();
-        } catch (Exception e) {
-            if (transaction != null) {
+            } catch (Exception e) {
                 transaction.rollback();
             }
-        } finally {
-            session.close();
         }
         return match;
     }
@@ -47,18 +39,15 @@ public class MatchImpl implements MatchCrud {
     @Override
     public void delete(Long id) {
 
-        Session session = HibernateUtil.getSessionFactory().openSession();
-        Transaction transaction = null;
-
-        try {
-            transaction = session.beginTransaction();
-            Match deletedMatch = session.get(Match.class, id);
-            session.delete(deletedMatch);
-            transaction.commit();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        } finally {
-            session.close();
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            Transaction transaction = session.beginTransaction();
+            try {
+                Match deletedMatch = session.get(Match.class, id);
+                session.remove(deletedMatch);
+                transaction.commit();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
         }
 
     }
@@ -66,36 +55,30 @@ public class MatchImpl implements MatchCrud {
     @Override
     public Optional<Match> update(Match match) {
 
-        Session session = HibernateUtil.getSessionFactory().openSession();
-        Transaction transaction = null;
-
-        try {
-            transaction = session.beginTransaction();
-            session.update(match);
-            transaction.commit();
-            return Optional.ofNullable(match);
-        } catch (Exception e) {
-            if (transaction != null) {
-                transaction.rollback();
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            Transaction transaction = session.beginTransaction();
+            try {
+                session.merge(match);
+                transaction.commit();
+                return Optional.ofNullable(match);
+            } catch (Exception e) {
+                if (transaction != null) {
+                    transaction.rollback();
+                }
             }
-        } finally {
-            session.close();
+            return Optional.empty();
         }
-        return Optional.empty();
     }
 
     @Override
     public List<Match> findAll() {
 
-        Session session = HibernateUtil.getSessionFactory().openSession();
-        List<Match> matches;
-        try {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            List<Match> matches;
             matches = session.createQuery("FROM Match", Match.class).list();
             return matches;
         } catch (Exception e) {
             return List.of();
-        } finally {
-            session.close();
         }
 
     }
@@ -103,16 +86,13 @@ public class MatchImpl implements MatchCrud {
     @Override
     public boolean existsById(Long id) {
 
-        Session session = HibernateUtil.getSessionFactory().openSession();
-
-        try {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             Match existing = session.get(Match.class, id);
-            if (existing != null) {
-                return existing !=null;
-            }
+            return existing != null;
+
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            return false;
         }
-        return false;
+
     }
 }

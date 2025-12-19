@@ -1,20 +1,34 @@
 package servlets;
 
-import dto.MatchRequestDto;
+import dao.PlayerImpl;
+import dto.NewMatch;
+import dto.PlayerRequest;
+import entity.Match;
+import entity.Player;
+import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import service.NewMatchService;
 
+@WebServlet ("/new-match")
 public class NewMatchServlet extends HttpServlet {
 
-private MatchRequestDto matchRequestDto = new MatchRequestDto();
+    private final PlayerImpl playerImpl = new PlayerImpl();
+    private final NewMatchService newMatchService = new NewMatchService();
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) {
+    protected void doPost (HttpServletRequest request, HttpServletResponse response) {
 
-        String name1 = request.getParameter("name1");
-        String name2 = request.getParameter("name2");
+        String player1 = request.getParameter("name1");
+        String player2 = request.getParameter("name2");
 
-        MatchRequestDto matchRequestDto1 = new MatchRequestDto(name1, name2);
+        PlayerRequest playerRequest1 = new PlayerRequest(player1);
+        PlayerRequest playerRequest2 = new PlayerRequest(player2);
+
+        Player playerOne = newMatchService.creatOrSavePlayer(playerRequest1);
+        Player playerTwo = newMatchService.creatOrSavePlayer(playerRequest2);
+
+        dto.NewMatch newMatch = newMatchService.creatMatch(playerOne, playerTwo);
     }
 }
