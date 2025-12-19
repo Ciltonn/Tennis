@@ -1,4 +1,6 @@
 package dao;
 
-public interface MatchCrud {
+import entity.Match;
+
+public interface MatchCrud extends CrudDao<Match, Long> {
 }
