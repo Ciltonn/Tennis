@@ -10,7 +10,7 @@ public class HibernateUtil {
 
     private static final SessionFactory sessionFactory;
 
-        static {
+    static {
         try {
             Configuration configuration = new Configuration();
             configuration.configure("hibernate.cfg.xml");
@@ -24,8 +24,5 @@ public class HibernateUtil {
     public static SessionFactory getSessionFactory() {
         return sessionFactory;
     }
-
-    public static void shutdown() {
-        getSessionFactory().close();
-    }
 }
+
