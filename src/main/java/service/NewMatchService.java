@@ -35,6 +35,6 @@ public class NewMatchService {
     }
 
     public void addCurrentMatch ( NewMatch newMatch) {
-        currentMatch.put((UUID.nameUUIDFromBytes()), newMatch);
+        currentMatch.put((UUID.randomUUID()), newMatch);
     }
 }

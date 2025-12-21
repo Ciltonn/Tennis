@@ -1,9 +1,7 @@
 package servlets;
 
 import dao.PlayerImpl;
-import dto.NewMatch;
 import dto.PlayerRequest;
-import entity.Match;
 import entity.Player;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -30,5 +28,7 @@ public class NewMatchServlet extends HttpServlet {
         Player playerTwo = newMatchService.creatOrSavePlayer(playerRequest2);
 
         dto.NewMatch newMatch = newMatchService.creatMatch(playerOne, playerTwo);
+
+        response.encodeRedirectURL("/match-score?uuid=match_id");
     }
 }
