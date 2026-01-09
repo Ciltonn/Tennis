@@ -1,23 +1,31 @@
 package service;
 
 import dao.PlayerImpl;
-import dto.NewMatch;
 import dto.PlayerRequest;
-import entity.Match;
+import dto.CurrentMatch;
 import entity.Player;
 
 import java.util.HashMap;
 import java.util.UUID;
 
 public class NewMatchService {
+    private  final PlayerImpl playerImpl;
+    private static final HashMap<UUID, CurrentMatch> currentMatch = new HashMap<>();
 
-    private final PlayerImpl playerImpl = new PlayerImpl();
-    HashMap<UUID, NewMatch> currentMatch = new HashMap<>();
+    public NewMatchService(PlayerImpl playerImpl) {
+        this.playerImpl = playerImpl;
+    }
 
-
+    public CurrentMatch creatNewMatch (PlayerRequest player1, PlayerRequest player2) {
+        Player playerOne = creatOrSavePlayer(player1);
+        Player playerTwo = creatOrSavePlayer(player2);
+        UUID matchId = UUID.randomUUID();
+        CurrentMatch currentNewMatch = new CurrentMatch(playerOne.getId(), playerTwo.getId(), matchId, 0,0,0);
+        currentMatch.put(matchId, currentNewMatch);
+        return currentNewMatch;
+    }
 
     public Player creatOrSavePlayer(PlayerRequest playerRequest) {
-
         Player player = playerImpl.findByName(playerRequest.getName()).orElse(null);
         if (player == null) {
             player = new Player();
@@ -27,14 +35,7 @@ public class NewMatchService {
         return player;
     }
 
-    public NewMatch creatMatch (Player player1, Player player2) {
-        Long idPlayer1 = player1.getId();
-        Long idPlayer2 = player2.getId();
-        NewMatch newMatch = new NewMatch(idPlayer1, idPlayer2, 0,0,0);
-        return newMatch;
-    }
 
-    public void addCurrentMatch ( NewMatch newMatch) {
-        currentMatch.put((UUID.randomUUID()), newMatch);
-    }
+
+
 }

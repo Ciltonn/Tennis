@@ -1,34 +1,44 @@
 package servlets;
 
 import dao.PlayerImpl;
+import dto.CurrentMatch;
 import dto.PlayerRequest;
 import entity.Player;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import service.NewMatchService;
 
-@WebServlet ("/new-match")
-public class NewMatchServlet extends HttpServlet {
+import java.io.IOException;
+import java.util.UUID;
 
-    private final PlayerImpl playerImpl = new PlayerImpl();
-    private final NewMatchService newMatchService = new NewMatchService();
+@WebServlet("/new-match")
+public class NewMatchServlet extends HttpServlet {
+    private NewMatchService newMatchService;
 
     @Override
-    protected void doPost (HttpServletRequest request, HttpServletResponse response) {
+    public void init() throws ServletException {
+        super.init();
+        ServletContext context = getServletContext();
+        this.newMatchService = (NewMatchService) context.getAttribute("player");
+    }
 
-        String player1 = request.getParameter("name1");
-        String player2 = request.getParameter("name2");
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        request.getRequestDispatcher("new-match.html").forward(request, response);
+    }
 
-        PlayerRequest playerRequest1 = new PlayerRequest(player1);
-        PlayerRequest playerRequest2 = new PlayerRequest(player2);
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        PlayerRequest playerRequest1 = new PlayerRequest(request.getParameter("playerOne"));
+        PlayerRequest playerRequest2 = new PlayerRequest(request.getParameter("playerTwo"));
 
-        Player playerOne = newMatchService.creatOrSavePlayer(playerRequest1);
-        Player playerTwo = newMatchService.creatOrSavePlayer(playerRequest2);
+        CurrentMatch match = newMatchService.creatNewMatch(playerRequest1, playerRequest2);
+        UUID match_id = match.getMatchId();
 
-        dto.NewMatch newMatch = newMatchService.creatMatch(playerOne, playerTwo);
-
-        response.encodeRedirectURL("/match-score?uuid=match_id");
+        response.sendRedirect("/match-score?uuid="+match_id);
     }
 }

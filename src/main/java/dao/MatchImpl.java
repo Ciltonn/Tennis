@@ -9,10 +9,8 @@ import java.util.List;
 import java.util.Optional;
 
 public class MatchImpl implements MatchCrud {
-
     @Override
     public Optional<Match> findById(Long id) {
-
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             Match findingMatch = session.get(Match.class, id);
             return Optional.ofNullable(findingMatch);
@@ -28,7 +26,6 @@ public class MatchImpl implements MatchCrud {
             try {
                 session.persist(match);
                 transaction.commit();
-
             } catch (Exception e) {
                 transaction.rollback();
             }
@@ -38,7 +35,6 @@ public class MatchImpl implements MatchCrud {
 
     @Override
     public void delete(Long id) {
-
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             Transaction transaction = session.beginTransaction();
             try {
@@ -49,12 +45,10 @@ public class MatchImpl implements MatchCrud {
                 throw new RuntimeException(e);
             }
         }
-
     }
 
     @Override
     public Optional<Match> update(Match match) {
-
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             Transaction transaction = session.beginTransaction();
             try {
@@ -72,7 +66,6 @@ public class MatchImpl implements MatchCrud {
 
     @Override
     public List<Match> findAll() {
-
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             List<Match> matches;
             matches = session.createQuery("FROM Match", Match.class).list();
@@ -80,19 +73,15 @@ public class MatchImpl implements MatchCrud {
         } catch (Exception e) {
             return List.of();
         }
-
     }
 
     @Override
     public boolean existsById(Long id) {
-
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             Match existing = session.get(Match.class, id);
             return existing != null;
-
         } catch (Exception e) {
             return false;
         }
-
     }
 }
