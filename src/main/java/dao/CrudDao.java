@@ -9,7 +9,7 @@ public interface CrudDao <T, ID>{
 
   T save(T entity);
 
-  void delete(ID Id);
+  void delete(ID id);
 
   Optional <T> update(T entity);
 

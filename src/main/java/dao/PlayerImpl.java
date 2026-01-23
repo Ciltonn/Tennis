@@ -16,7 +16,7 @@ public class PlayerImpl implements PlayerCrud {
     @Override
     public Optional<Player> findByName(String name) {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            Query<Player> query = session.createQuery("FROM Player WHERE name = :name", Player.class);
+            Query<Player> query = session.createQuery("FROM Player p WHERE p.name = :name", Player.class);
             query.setParameter("name", name);
             return Optional.ofNullable(query.uniqueResult());
         } catch (Exception e) {

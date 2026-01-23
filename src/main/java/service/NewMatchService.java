@@ -1,27 +1,29 @@
 package service;
 
 import dao.PlayerImpl;
+import dto.MatchState;
 import dto.PlayerRequest;
 import dto.CurrentMatch;
+import dto.TennisPoint;
 import entity.Player;
 
-import java.util.HashMap;
 import java.util.UUID;
+
+import static service.OngoingMatchService.currentMatches;
 
 public class NewMatchService {
     private  final PlayerImpl playerImpl;
-    private static final HashMap<UUID, CurrentMatch> currentMatch = new HashMap<>();
 
     public NewMatchService(PlayerImpl playerImpl) {
         this.playerImpl = playerImpl;
-    }
+                    }
 
-    public CurrentMatch creatNewMatch (PlayerRequest player1, PlayerRequest player2) {
+    public CurrentMatch createNewMatch (PlayerRequest player1, PlayerRequest player2) {
         Player playerOne = creatOrSavePlayer(player1);
         Player playerTwo = creatOrSavePlayer(player2);
         UUID matchId = UUID.randomUUID();
-        CurrentMatch currentNewMatch = new CurrentMatch(playerOne.getId(), playerTwo.getId(), matchId, 0,0,0);
-        currentMatch.put(matchId, currentNewMatch);
+        CurrentMatch currentNewMatch = new CurrentMatch(matchId, playerOne.getId(), playerTwo.getId(),0,0, TennisPoint.ZERO, 0,0,TennisPoint.ZERO,new MatchState());
+        currentMatches.put(matchId, currentNewMatch);
         return currentNewMatch;
     }
 
@@ -34,8 +36,4 @@ public class NewMatchService {
         }
         return player;
     }
-
-
-
-
 }

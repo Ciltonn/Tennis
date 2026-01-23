@@ -5,15 +5,19 @@ import lombok.*;
 import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
+@Getter
+@Setter
 
 public class CurrentMatch {
+    private UUID matchId;
     private Long idPlayer1;
     private Long idPlayer2;
-    private UUID matchId;
-    private int sets;
-    private int games;
-    private int points;
-
+    private int sets1;
+    private int games1;
+    private TennisPoint points1;
+    private int sets2;
+    private int games2;
+    private TennisPoint points2;
+    private MatchState matchState;
 
 }
