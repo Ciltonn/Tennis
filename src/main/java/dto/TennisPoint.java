@@ -10,8 +10,9 @@ public enum TennisPoint {
     FIFTEEN(15),
     THIRTY(30),
     FORTY(40),
-    ADVANTAGE(50),
-    NOTADVANTAGE(60);
+    GAME(50),
+    ADVANTAGE(60),
+    NOTADVANTAGE(70);
 
 
     private final int value;
@@ -30,6 +31,8 @@ public enum TennisPoint {
                 return "AD";
             case NOTADVANTAGE:
                 return "  ";
+            case GAME:
+                return "GAME";
             default:
                 return String.valueOf(value);
         }
@@ -44,7 +47,7 @@ public enum TennisPoint {
             case THIRTY:
                 return FORTY;
             case FORTY:
-                return ZERO;
+                return GAME;
             default:
                 return this;
         }

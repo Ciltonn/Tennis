@@ -25,9 +25,9 @@ public class MatchScoreCalculationService {
         Long playerId = player.getId();
         MatchState state = currentMatch.getMatchState();
 
-        if(!state.isTieBreak()) {
+        if (!state.isTieBreak()) {
             if (!state.isDeuce()) {
-                if (!state.isPlayer1Advantage() || !state.isPlayer2Advantage()) {
+                if (!state.isPlayer1Advantage() && !state.isPlayer2Advantage()) {
                     countingGame(currentMatch, playerId);
                 } else {
                     countingAdvantage(currentMatch, playerId);
@@ -52,6 +52,22 @@ public class MatchScoreCalculationService {
             currentMatch.setPoints2(tennisPoint.getNextValuePoints());
         }
         isDeucePoints(currentMatch);
+        isGameWin(currentMatch, playerId);
+    }
+
+    private void isGameWin(CurrentMatch currentMatch, Long playerId) {
+        MatchState state = currentMatch.getMatchState();
+        if (!state.isDeuce() && !state.isPlayer1Advantage() && !state.isPlayer2Advantage()) {
+            if (playerId.equals(currentMatch.getIdPlayer1())) {
+                if (currentMatch.getPoints1() == TennisPoint.GAME) {
+                    currentMatch.setPoints1(TennisPoint.ZERO);
+                    currentMatch.setGames1(currentMatch.getGames1()+1);
+                } else if(currentMatch.getPoints2() == TennisPoint.GAME) {
+                    currentMatch.setPoints2(TennisPoint.ZERO);
+                    currentMatch.setGames2(currentMatch.getGames1()+1);
+                }
+            }
+        }
     }
 
     private void countingAdvantage(CurrentMatch currentMatch, Long playerId) {
@@ -59,12 +75,17 @@ public class MatchScoreCalculationService {
         if (state.isPlayer1Advantage() && currentMatch.getIdPlayer1().equals(playerId)) {
             state.setPlayer1Advantage(false);
             currentMatch.setPoints1(TennisPoint.ZERO);
-            currentMatch.setGames1(currentMatch.getGames1()+1);
-        } else if(state.isPlayer2Advantage() && currentMatch.getIdPlayer2().equals(playerId)) {
+            currentMatch.setGames1(currentMatch.getGames1() + 1);
+        } else if (state.isPlayer2Advantage() && currentMatch.getIdPlayer2().equals(playerId)) {
             state.setPlayer2Advantage(false);
             currentMatch.setPoints2(TennisPoint.ZERO);
-            currentMatch.setGames2(currentMatch.getGames1()+1);
+            currentMatch.setGames2(currentMatch.getGames1() + 1);
+        } else {
+            state.setPlayer2Advantage(false);
+            state.setPlayer2Advantage(false);
+            state.setDeuce(true);
         }
+        currentMatch.setMatchState(state);
         isWinSet(currentMatch);
         isTieBreakGames(currentMatch, playerId);
     }
@@ -91,30 +112,36 @@ public class MatchScoreCalculationService {
         if (currentMatch.getPoints1() == TennisPoint.FORTY && currentMatch.getPoints2() == TennisPoint.FORTY) {
             MatchState state = currentMatch.getMatchState();
             state.setDeuce(true);
+            currentMatch.setMatchState(state);
         }
     }
+
     private void isTieBreakGames(CurrentMatch currentMatch, Long playerId) {
         MatchState state = currentMatch.getMatchState();
-        if(currentMatch.getGames1()==6 && currentMatch.getGames2()==6) {
-          state.setTieBreak(true);
-            }
+        if (currentMatch.getGames1() == 6 && currentMatch.getGames2() == 6) {
+            state.setTieBreak(true);
+            currentMatch.setMatchState(state);
         }
+    }
 
     private void isWinSet(CurrentMatch currentMatch) {
-        if(currentMatch.getGames1()==6 && (currentMatch.getGames1()-currentMatch.getGames2())==2) {
-            currentMatch.setSets1(currentMatch.getSets1()+1);
+        if (currentMatch.getGames1() == 6 && (currentMatch.getGames1() - currentMatch.getGames2()) == 2) {
+            currentMatch.setSets1(currentMatch.getSets1() + 1);
             currentMatch.setGames1(0);
-        } else if(currentMatch.getGames2()==6 && (currentMatch.getGames2()-currentMatch.getGames1())==2) {
-            currentMatch.setSets2(currentMatch.getSets2()+1);
+        } else if (currentMatch.getGames2() == 6 && (currentMatch.getGames2() - currentMatch.getGames1()) == 2) {
+            currentMatch.setSets2(currentMatch.getSets2() + 1);
             currentMatch.setGames1(0);
         }
     }
-    private void   countingTieBreak(CurrentMatch currentMatch, Long playerId) {
+
+    private void countingTieBreak(CurrentMatch currentMatch, Long playerId) {
+        if(playerId.equals(currentMatch.getIdPlayer1())) {
         currentMatch.setPoints1(TennisPoint.ZERO);
         currentMatch.setPoints2(TennisPoint.ZERO);
         currentMatch.setGames1(0);
         currentMatch.setGames2(0);
     }
+
 
 
 }
