@@ -25,21 +25,22 @@ public class MatchScoreCalculationService {
         Long playerId = player.getId();
         MatchState state = currentMatch.getMatchState();
 
-        if (!state.isTieBreak()) {
-            if (!state.isDeuce()) {
-                if (!state.isPlayer1Advantage() && !state.isPlayer2Advantage()) {
-                    countingGame(currentMatch, playerId);
+        if (!state.isMatchOver()) {
+            if (!state.isTieBreak()) {
+                if (!state.isDeuce()) {
+                    if (!state.isPlayer1Advantage() && !state.isPlayer2Advantage()) {
+                        countingGame(currentMatch, playerId);
+                    } else {
+                        countingAdvantage(currentMatch, playerId);
+                    }
                 } else {
-                    countingAdvantage(currentMatch, playerId);
+                    countingDeuce(currentMatch, playerId);
                 }
             } else {
-                countingDeuce(currentMatch, playerId);
+                countingTieBreak(currentMatch, playerId);
             }
-        } else {
-            countingTieBreak(currentMatch, playerId);
+            chekMatchOver(currentMatch);
         }
-
-
         return currentMatch;
     }
 
@@ -61,17 +62,17 @@ public class MatchScoreCalculationService {
         if (!state.isDeuce() && !state.isPlayer1Advantage() && !state.isPlayer2Advantage()) {
             if (playerId.equals(currentMatch.getIdPlayer1())) {
                 TennisPoint tennisPoint1 = currentMatch.getGames1();
-                if (currentMatch.getPoints1() == TennisPoint.GAME) {
+                if (currentMatch.getPoints1().equals(TennisPoint.GAME)) {
                     currentMatch.setPoints1(TennisPoint.ZERO);
                     currentMatch.setGames1(tennisPoint1.getNextValueGame());
                     currentMatch.setPoints2(TennisPoint.ZERO);
                 }
             } else if (playerId.equals(currentMatch.getIdPlayer2())) {
-            if (currentMatch.getPoints2() == TennisPoint.GAME) {
+                if (currentMatch.getPoints2().equals(TennisPoint.GAME)) {
                     TennisPoint tennisPoint2 = currentMatch.getGames2();
                     currentMatch.setPoints2(TennisPoint.ZERO);
                     currentMatch.setGames2(tennisPoint2.getNextValueGame());
-                currentMatch.setPoints1(TennisPoint.ZERO);
+                    currentMatch.setPoints1(TennisPoint.ZERO);
                 }
             }
         }
@@ -101,7 +102,7 @@ public class MatchScoreCalculationService {
         }
         currentMatch.setMatchState(state);
         isWinSet(currentMatch);
-        isTieBreakGames(currentMatch, playerId);
+
 
     }
 
@@ -131,39 +132,58 @@ public class MatchScoreCalculationService {
         }
     }
 
-    private void isTieBreakGames(CurrentMatch currentMatch, Long playerId) {
-        MatchState state = currentMatch.getMatchState();
-        if (currentMatch.getGames1() == TennisPoint.SIXGAME && currentMatch.getGames2() == TennisPoint.SIXGAME) {
-            state.setTieBreak(true);
-            currentMatch.setMatchState(state);
-            currentMatch.setGames1(TennisPoint.ZEROGAME);
-            currentMatch.setGames2(TennisPoint.ZEROGAME);
-        }
-    }
 
     private void isWinSet(CurrentMatch currentMatch) {
         int scoreGamePlayer1 = currentMatch.getGames1().getValue();
         int scoreGamePlayer2 = currentMatch.getGames2().getValue();
-        if (currentMatch.getGames1() == TennisPoint.SIXGAME && (scoreGamePlayer1-scoreGamePlayer2>=2)) {
+        if (currentMatch.getGames1().equals(TennisPoint.SIXGAME) && (scoreGamePlayer1 - scoreGamePlayer2 >= 2)) {
             currentMatch.setSets1(currentMatch.getSets1() + 1);
             currentMatch.setGames1(TennisPoint.ZEROGAME);
             currentMatch.setGames2(TennisPoint.ZEROGAME);
-        } else if (currentMatch.getGames2() == TennisPoint.SIXGAME && (scoreGamePlayer2-scoreGamePlayer1>=2)) {
+        } else if (currentMatch.getGames2() == TennisPoint.SIXGAME && (scoreGamePlayer2 - scoreGamePlayer1 >= 2)) {
             currentMatch.setSets2(currentMatch.getSets2() + 1);
             currentMatch.setGames2(TennisPoint.ZEROGAME);
             currentMatch.setGames1(TennisPoint.ZEROGAME);
+
+        }
+
+         if (currentMatch.getGames1().equals(TennisPoint.SIXGAME) && currentMatch.getGames2().equals(TennisPoint.SIXGAME)) {
+            MatchState state = currentMatch.getMatchState();
+            state.setTieBreak(true);
+            currentMatch.setGames1(TennisPoint.ZEROGAME);
+            currentMatch.setGames2(TennisPoint.ZEROGAME);
+            currentMatch.setPoints1(TennisPoint.ZERO);
+            currentMatch.setPoints2(TennisPoint.ZERO);
         }
     }
 
     private void countingTieBreak(CurrentMatch currentMatch, Long playerId) {
-        TennisPoint tennisPoint1 = currentMatch.getGames1();
+
         if (playerId.equals(currentMatch.getIdPlayer1())) {
+            TennisPoint tennisPoint1 = currentMatch.getGames1();
             currentMatch.setGames1(tennisPoint1.getNextValueGame());
-        } else if(playerId.equals(currentMatch.getIdPlayer2())) {
+        }
+
+        if (playerId.equals(currentMatch.getIdPlayer2())) {
             TennisPoint tennisPoint2 = currentMatch.getGames2();
             currentMatch.setGames2(tennisPoint2.getNextValueGame());
         }
+        chekTieBreakOver(currentMatch);
+    }
+    private void chekTieBreakOver(CurrentMatch currentMatch) {
+        int scoreGamePlayer1 = currentMatch.getGames1().getValue();
+        int scoreGamePlayer2 = currentMatch.getGames2().getValue();
+        if((currentMatch.getGames1().equals(TennisPoint.SEVENGAME) && (scoreGamePlayer1-scoreGamePlayer2>=2)) ||
+                (currentMatch.getGames2().equals(TennisPoint.SEVENGAME) && (scoreGamePlayer2-scoreGamePlayer1>=2))) {
+            if(scoreGamePlayer1>scoreGamePlayer2) {
+                currentMatch.setSets1(currentMatch.getSets1()+1);
+            } else {
+                currentMatch.setSets2(currentMatch.getSets2()+1);
+            }
         }
     }
+
+    }
+
 
 
