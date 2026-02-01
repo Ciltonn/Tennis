@@ -15,22 +15,22 @@ public class FinishedMatchesPersistenceService {
     private PlayerImpl playerImpl;
     private MatchImpl matchImpl;
 
-    public FinishedMatchesPersistenceService(MatchScoreCalculationService matchScoreCalculationService, OngoingMatchService ongoingMatchService, PlayerImpl playerImpl) {
+    public FinishedMatchesPersistenceService(MatchScoreCalculationService matchScoreCalculationService, OngoingMatchService ongoingMatchService, PlayerImpl playerImpl, MatchImpl matchImpl) {
         MatchScoreCalculationService = matchScoreCalculationService;
         this.ongoingMatchService = ongoingMatchService;
         this.playerImpl = playerImpl;
         this.matchImpl = matchImpl;
     }
 
-//    public void finishMatch (UUID uuid, Long idPlayer) {
-//        CurrentMatch currentMatch = ongoingMatchService.getCurrentMatch(uuid);
-//        Player player1 = playerImpl.findById(currentMatch.getIdPlayer1()).orElseThrow();
-//        Player player2 = playerImpl.findById(currentMatch.getIdPlayer2()).orElseThrow();
-//        Player winner = playerImpl.findById(idPlayer).orElseThrow();
-//
-//        FinishedMatch finishedMatch = new FinishedMatch(player1, player2, winner);
-//        matchImpl.save(finishedMatch);
-//
-//       ongoingMatchService.deleteCurrentMatch(uuid);
-//    }
+    public void finishMatch (UUID uuid, Long idPlayer) {
+        CurrentMatch currentMatch = ongoingMatchService.getCurrentMatch(uuid);
+        Player player1 = playerImpl.findById(currentMatch.getIdPlayer1()).orElseThrow();
+        Player player2 = playerImpl.findById(currentMatch.getIdPlayer2()).orElseThrow();
+        Player winner = playerImpl.findById(idPlayer).orElseThrow();
+
+        FinishedMatch finishedMatch = new FinishedMatch(player1, player2, winner);
+        matchImpl.save(finishedMatch);
+
+       ongoingMatchService.deleteCurrentMatch(uuid);
+    }
 }
