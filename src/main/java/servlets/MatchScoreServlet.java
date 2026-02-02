@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import service.MatchScoreCalculationService;
 import service.OngoingMatchService;
+
 import java.io.IOException;
 import java.util.UUID;
 
@@ -23,22 +24,22 @@ public class MatchScoreServlet extends HttpServlet {
 
 
     @Override
-    public  void init() throws ServletException {
+    public void init() throws ServletException {
         super.init();
         ServletContext context = getServletContext();
         this.ongoingMatchService = (OngoingMatchService) context.getAttribute("ongoingMatchService");
         this.playerImpl = (PlayerImpl) context.getAttribute("player");
         this.matchScoreCalculationService = (MatchScoreCalculationService) context.getAttribute("matchScoreCalculationService");
-        }
+    }
 
     @Override
-    protected void doGet (HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String matchId = request.getParameter("uuid");
         UUID uuid = UUID.fromString(matchId);
         CurrentMatch match = ongoingMatchService.getCurrentMatch(uuid);
-        Player player1=playerImpl.findById(match.getIdPlayer1())
+        Player player1 = playerImpl.findById(match.getIdPlayer1())
                 .orElseThrow();
-        Player player2=playerImpl.findById(match.getIdPlayer2())
+        Player player2 = playerImpl.findById(match.getIdPlayer2())
                 .orElseThrow();
 
 
@@ -51,20 +52,20 @@ public class MatchScoreServlet extends HttpServlet {
         request.setAttribute("games2", match.getGames2());
         request.setAttribute("points1", match.getPoints1());
         request.setAttribute("points2", match.getPoints2());
-
+        request.setAttribute("isTieBreak", match.getMatchState().isTieBreak());
         request.getRequestDispatcher("/match-score.jsp").forward(request, response);
 
     }
 
     @Override
-    public void doPost (HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String playerName = request.getParameter("player");
         String matchIdString = request.getParameter("uuid");
         UUID matchId = UUID.fromString(matchIdString);
-        CurrentMatch match = matchScoreCalculationService.calculateScore(matchId, playerName);
-        Player player1=playerImpl.findById(match.getIdPlayer1())
+        CurrentMatch match = matchScoreCalculationService.saveMatch(matchId, playerName);
+        Player player1 = playerImpl.findById(match.getIdPlayer1())
                 .orElseThrow();
-        Player player2=playerImpl.findById(match.getIdPlayer2())
+        Player player2 = playerImpl.findById(match.getIdPlayer2())
                 .orElseThrow();
 
 
@@ -79,7 +80,7 @@ public class MatchScoreServlet extends HttpServlet {
         request.setAttribute("points2", match.getPoints2());
 
 
-       request.getRequestDispatcher("/match-score.jsp").forward(request, response);
+        request.getRequestDispatcher("/match-score.jsp").forward(request, response);
 
     }
 }

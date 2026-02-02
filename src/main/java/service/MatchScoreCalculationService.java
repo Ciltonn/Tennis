@@ -14,22 +14,32 @@ public class MatchScoreCalculationService {
     private static final int MIN_GAMES_TO_WIN_TIEBREAK = 7;
     private static final int MIN_GAMES_TO_WIN_SET = 6;
     private static final int SETS_TO_WIN_MATCH = 2;
-    private OngoingMatchService ongoingMatchService;
-    private PlayerImpl playerImpl;
-    private FinishedMatchesPersistenceService finishedMatchesPersistenceService;
 
-    public MatchScoreCalculationService(OngoingMatchService ongoingMatchService, PlayerImpl playerImpl, FinishedMatchesPersistenceService finishedMatchesPersistenceService) {
-        this.ongoingMatchService = ongoingMatchService;
+    private final OngoingMatchService ongoingMatchService;
+    private final PlayerImpl playerImpl;
+    private final FinishedMatchesPersistenceService finishedMatchesPersistenceService;
+
+    public MatchScoreCalculationService(PlayerImpl playerImpl, FinishedMatchesPersistenceService finishedMatchesPersistenceService, OngoingMatchService ongoingMatchService) {
         this.playerImpl = playerImpl;
         this.finishedMatchesPersistenceService = finishedMatchesPersistenceService;
+        this.ongoingMatchService = ongoingMatchService;
     }
 
-    public CurrentMatch calculateScore(UUID uuid, String playerName) {
+    public CurrentMatch saveMatch(UUID uuid, String playerName) {
+        CurrentMatch currentMatch = calculateScore(uuid, playerName);
+        MatchState state = currentMatch.getMatchState();
+        if (state.isMatchOver()) {
+            Long winnerId = getWinner(currentMatch);
+            finishedMatchesPersistenceService.finishMatch(uuid, winnerId);
+        }
+        return currentMatch;
+    }
+
+    private CurrentMatch calculateScore(UUID uuid, String playerName) {
         CurrentMatch currentMatch = ongoingMatchService.getCurrentMatch(uuid);
         Player player = playerImpl.findByName(playerName).orElseThrow();
         Long playerId = player.getId();
         MatchState state = currentMatch.getMatchState();
-
         if (!state.isMatchOver()) {
             if (!state.isTieBreak()) {
                 if (!state.isDeuce()) {
@@ -45,9 +55,6 @@ public class MatchScoreCalculationService {
                 countingTieBreak(currentMatch, playerId);
             }
             checkMatchOver(currentMatch);
-        } else {
-            Long winner = getWinner(currentMatch);
-            finishedMatchesPersistenceService.finishMatch(uuid, winner);
         }
         return currentMatch;
     }
@@ -60,27 +67,24 @@ public class MatchScoreCalculationService {
             TennisPoint tennisPoint = currentMatch.getPoints2();
             currentMatch.setPoints2(tennisPoint.getNextValuePoints());
         }
-        isDeucePoints(currentMatch);
-        isGameWin(currentMatch, playerId);
-        isWinSet(currentMatch);
+        checkDeuce(currentMatch);
+        checkGameWin(currentMatch, playerId);
     }
 
-    private void isGameWin(CurrentMatch currentMatch, Long playerId) {
+    private void checkGameWin(CurrentMatch currentMatch, Long playerId) {
         MatchState state = currentMatch.getMatchState();
         if (!state.isDeuce() && !state.isPlayer1Advantage() && !state.isPlayer2Advantage()) {
             if (playerId.equals(currentMatch.getIdPlayer1())) {
-                TennisPoint tennisPoint1 = currentMatch.getGames1();
                 if (currentMatch.getPoints1().equals(TennisPoint.GAME)) {
-                    currentMatch.setPoints1(TennisPoint.ZERO);
-                    currentMatch.setGames1(tennisPoint1.getNextValueGame());
-                    currentMatch.setPoints2(TennisPoint.ZERO);
+                    currentMatch.setGames1(currentMatch.getGames1() + 1);
+                    resetPoints(currentMatch);
+                    checkSetWin(currentMatch);
                 }
             } else if (playerId.equals(currentMatch.getIdPlayer2())) {
                 if (currentMatch.getPoints2().equals(TennisPoint.GAME)) {
-                    TennisPoint tennisPoint2 = currentMatch.getGames2();
-                    currentMatch.setPoints2(TennisPoint.ZERO);
-                    currentMatch.setGames2(tennisPoint2.getNextValueGame());
-                    currentMatch.setPoints1(TennisPoint.ZERO);
+                    currentMatch.setGames2(currentMatch.getGames2() + 1);
+                    resetPoints(currentMatch);
+                    checkSetWin(currentMatch);
                 }
             }
         }
@@ -90,17 +94,15 @@ public class MatchScoreCalculationService {
         MatchState state = currentMatch.getMatchState();
 
         if (state.isPlayer1Advantage() && currentMatch.getIdPlayer1().equals(playerId)) {
-            TennisPoint tennisPoint1 = currentMatch.getGames1();
             state.setPlayer1Advantage(false);
-            currentMatch.setPoints1(TennisPoint.ZERO);
-            currentMatch.setPoints2(TennisPoint.ZERO);
-            currentMatch.setGames1(tennisPoint1.getNextValueGame());
+            resetPoints(currentMatch);
+            currentMatch.setGames1(currentMatch.getGames1() + 1);
+            checkSetWin(currentMatch);
         } else if (state.isPlayer2Advantage() && currentMatch.getIdPlayer2().equals(playerId)) {
-            TennisPoint tennisPoint2 = currentMatch.getGames2();
             state.setPlayer2Advantage(false);
-            currentMatch.setPoints2(TennisPoint.ZERO);
-            currentMatch.setPoints1(TennisPoint.ZERO);
-            currentMatch.setGames2(tennisPoint2.getNextValueGame());
+            resetPoints(currentMatch);
+            currentMatch.setGames2(currentMatch.getGames2() + 1);
+            checkSetWin(currentMatch);
         } else {
             state.setPlayer1Advantage(false);
             state.setPlayer2Advantage(false);
@@ -109,9 +111,6 @@ public class MatchScoreCalculationService {
             currentMatch.setPoints1(TennisPoint.FORTY);
         }
         currentMatch.setMatchState(state);
-        isWinSet(currentMatch);
-
-
     }
 
     private void countingDeuce(CurrentMatch currentMatch, Long playerId) {
@@ -119,83 +118,92 @@ public class MatchScoreCalculationService {
         if (!state.isPlayer1Advantage() && !state.isPlayer2Advantage()) {
             if (playerId.equals(currentMatch.getIdPlayer1())) {
                 currentMatch.setPoints1(TennisPoint.ADVANTAGE);
-                currentMatch.setPoints2(TennisPoint.NOTADVANTAGE);
                 state.setPlayer1Advantage(true);
                 state.setDeuce(false);
             } else {
                 currentMatch.setPoints2(TennisPoint.ADVANTAGE);
-                currentMatch.setPoints1(TennisPoint.NOTADVANTAGE);
                 state.setPlayer2Advantage(true);
                 state.setDeuce(false);
             }
-
         }
+        currentMatch.setMatchState(state);
     }
 
-    private void isDeucePoints(CurrentMatch currentMatch) {
-        if (currentMatch.getPoints1() == TennisPoint.FORTY && currentMatch.getPoints2() == TennisPoint.FORTY) {
+    private void checkDeuce(CurrentMatch currentMatch) {
+        if (currentMatch.getPoints1() == TennisPoint.FORTY &&
+                currentMatch.getPoints2() == TennisPoint.FORTY) {
             MatchState state = currentMatch.getMatchState();
             state.setDeuce(true);
             currentMatch.setMatchState(state);
         }
     }
 
-    private void isWinSet(CurrentMatch currentMatch) {
-        int scoreGamePlayer1 = currentMatch.getGames1().getValue();
-        int scoreGamePlayer2 = currentMatch.getGames2().getValue();
-        if ((scoreGamePlayer1 >= MIN_GAMES_TO_WIN_SET) && ((scoreGamePlayer1 - scoreGamePlayer2) >= MIN_POINT_DIFFERENCE)) {
+    private void checkSetWin(CurrentMatch currentMatch) {
+        if (currentMatch.getGames1() >= MIN_GAMES_TO_WIN_SET &&
+                ((currentMatch.getGames1() - currentMatch.getGames2()) >= MIN_POINT_DIFFERENCE)) {
             currentMatch.setSets1(currentMatch.getSets1() + 1);
-            currentMatch.setGames1(TennisPoint.ZEROGAME);
-            currentMatch.setGames2(TennisPoint.ZEROGAME);
-        } else if ((scoreGamePlayer2 >= MIN_GAMES_TO_WIN_SET) && ((scoreGamePlayer2 - scoreGamePlayer1) >= MIN_POINT_DIFFERENCE)) {
+            resetGames(currentMatch);
+            resetMatchState(currentMatch);
+            checkMatchOver(currentMatch);
+        } else if (currentMatch.getGames2() >= MIN_GAMES_TO_WIN_SET &&
+                ((currentMatch.getGames2() - currentMatch.getGames1()) >= MIN_POINT_DIFFERENCE)) {
             currentMatch.setSets2(currentMatch.getSets2() + 1);
-            currentMatch.setGames2(TennisPoint.ZEROGAME);
-            currentMatch.setGames1(TennisPoint.ZEROGAME);
+            resetGames(currentMatch);
+            resetMatchState(currentMatch);
+            checkMatchOver(currentMatch);
         }
-        if (scoreGamePlayer1 == MIN_GAMES_TO_WIN_SET && scoreGamePlayer2 == MIN_GAMES_TO_WIN_SET) {
+        if (currentMatch.getGames1() == MIN_GAMES_TO_WIN_SET &&
+                currentMatch.getGames2() == MIN_GAMES_TO_WIN_SET) {
             MatchState state = currentMatch.getMatchState();
             state.setTieBreak(true);
-            currentMatch.setGames1(TennisPoint.ZEROGAME);
-            currentMatch.setGames2(TennisPoint.ZEROGAME);
-            currentMatch.setPoints1(TennisPoint.ZERO);
-            currentMatch.setPoints2(TennisPoint.ZERO);
+            resetGamesAndPoints(currentMatch);
+            resetMatchState(currentMatch);
+
         }
+
+    }
+
+    private void resetMatchState(CurrentMatch currentMatch) {
+        MatchState state = currentMatch.getMatchState();
+        state.setDeuce(false);
+        state.setPlayer1Advantage(false);
+        state.setPlayer2Advantage(false);
     }
 
     private void countingTieBreak(CurrentMatch currentMatch, Long playerId) {
-
         if (playerId.equals(currentMatch.getIdPlayer1())) {
-            TennisPoint tennisPoint1 = currentMatch.getGames1();
-            currentMatch.setGames1(tennisPoint1.getNextValueGame());
+            currentMatch.setGames1(currentMatch.getGames1() + 1);
         }
-
         if (playerId.equals(currentMatch.getIdPlayer2())) {
-            TennisPoint tennisPoint2 = currentMatch.getGames2();
-            currentMatch.setGames2(tennisPoint2.getNextValueGame());
+
+            currentMatch.setGames2(currentMatch.getGames2() + 1);
         }
         checkTieBreakOver(currentMatch);
     }
 
     private void checkTieBreakOver(CurrentMatch currentMatch) {
-        int scoreGamePlayer1 = currentMatch.getGames1().getValue();
-        int scoreGamePlayer2 = currentMatch.getGames2().getValue();
-        if ((currentMatch.getGames1().equals(TennisPoint.SEVENGAME) && (scoreGamePlayer1 - scoreGamePlayer2 >= MIN_POINT_DIFFERENCE)) ||
-                (currentMatch.getGames2().equals(TennisPoint.SEVENGAME) && (scoreGamePlayer2 - scoreGamePlayer1 >= MIN_POINT_DIFFERENCE))) {
-            if (scoreGamePlayer1 > scoreGamePlayer2) {
+        if ((currentMatch.getGames1() >= MIN_GAMES_TO_WIN_TIEBREAK ||
+                currentMatch.getGames2() >= MIN_GAMES_TO_WIN_TIEBREAK) &&
+                Math.abs(currentMatch.getGames1() - currentMatch.getGames2()) >= MIN_POINT_DIFFERENCE) {
+            if (currentMatch.getGames1() > currentMatch.getGames2()) {
                 currentMatch.setSets1(currentMatch.getSets1() + 1);
             } else {
                 currentMatch.setSets2(currentMatch.getSets2() + 1);
             }
+            currentMatch.getMatchState().setTieBreak(false);
+            currentMatch.setGames1(0);
+            currentMatch.setGames2(0);
+            resetGamesAndPoints(currentMatch);
+            resetMatchState(currentMatch);
+            checkMatchOver(currentMatch);
         }
     }
 
     private void checkMatchOver(CurrentMatch currentMatch) {
         MatchState state = currentMatch.getMatchState();
-        int setsPlayer1 = currentMatch.getSets1();
-        int setsPlayer2 = currentMatch.getSets2();
-        if (setsPlayer1 >= SETS_TO_WIN_MATCH || setsPlayer2 >= SETS_TO_WIN_MATCH) {
+        if (currentMatch.getSets1() >= SETS_TO_WIN_MATCH
+                || currentMatch.getSets2() >= SETS_TO_WIN_MATCH) {
             state.setMatchOver(true);
-            currentMatch.setMatchState(state);
         }
     }
 
@@ -212,7 +220,25 @@ public class MatchScoreCalculationService {
         }
         throw new IllegalStateException("Match is't finished");
     }
+
+    private void resetGamesAndPoints(CurrentMatch currentMatch) {
+        currentMatch.setGames1(0);
+        currentMatch.setGames2(0);
+        currentMatch.setPoints1(TennisPoint.ZERO);
+        currentMatch.setPoints2(TennisPoint.ZERO);
+    }
+
+    private void resetGames(CurrentMatch currentMatch) {
+        currentMatch.setGames1(0);
+        currentMatch.setGames2(0);
+    }
+
+    private void resetPoints(CurrentMatch currentMatch) {
+        currentMatch.setPoints1(TennisPoint.ZERO);
+        currentMatch.setPoints2(TennisPoint.ZERO);
+    }
 }
+
 
 
 

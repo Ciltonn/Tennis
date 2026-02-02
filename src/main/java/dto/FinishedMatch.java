@@ -1,16 +1,16 @@
 package dto;
 
-import entity.Player;
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
 @AllArgsConstructor
-@NoArgsConstructor
+@Getter
+@Setter
 
 public class FinishedMatch {
-    private Player player1;
-    private Player player2;
-    private Player winner;
+    private CurrentMatch currentMatch;
+    Long winnerId;
 
 
 }

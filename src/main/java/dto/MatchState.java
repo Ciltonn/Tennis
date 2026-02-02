@@ -10,9 +10,9 @@ import lombok.Setter;
 @Getter
 @Setter
 public class MatchState {
-    boolean isMatchOver = false;
+    boolean matchOver = false;
     boolean tieBreak = false;
-    boolean isDeuce = false;
-    boolean isPlayer1Advantage = false;
-    boolean isPlayer2Advantage = false;
+    boolean deuce = false;
+    boolean player1Advantage = false;
+    boolean player2Advantage = false;
 }

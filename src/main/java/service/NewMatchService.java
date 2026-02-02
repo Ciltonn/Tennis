@@ -22,7 +22,7 @@ public class NewMatchService {
         Player playerOne = creatOrSavePlayer(player1);
         Player playerTwo = creatOrSavePlayer(player2);
         UUID matchId = UUID.randomUUID();
-        CurrentMatch currentNewMatch = new CurrentMatch(matchId, playerOne.getId(), playerTwo.getId(),0, TennisPoint.ZEROGAME, TennisPoint.ZERO, 0,TennisPoint.ZEROGAME, TennisPoint.ZERO,new MatchState());
+        CurrentMatch currentNewMatch = new CurrentMatch(matchId, playerOne.getId(), playerTwo.getId(),0, 0, TennisPoint.ZERO, 0,0, TennisPoint.ZERO,new MatchState());
         currentMatches.put(matchId, currentNewMatch);
         return currentNewMatch;
     }
