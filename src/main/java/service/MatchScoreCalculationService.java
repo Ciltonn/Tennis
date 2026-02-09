@@ -56,7 +56,7 @@ public class MatchScoreCalculationService {
             }
             checkMatchOver(currentMatch);
         }
-        return currentMatch;
+               return currentMatch;
     }
 
     private void countingGame(CurrentMatch currentMatch, Long playerId) {

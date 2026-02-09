@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import util.HibernateUtil;
+import org.hibernate.query.Query;
 
 import java.util.List;
 import java.util.Optional;
@@ -28,7 +29,7 @@ public class MatchImpl implements MatchCrud {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             Transaction transaction = session.beginTransaction();
             try {
-                session.persist(match);
+                session.merge(match);
                 transaction.commit();
                 return match;
             } catch (Exception e) {
@@ -59,9 +60,10 @@ public class MatchImpl implements MatchCrud {
                 log.error("Error deleting match with ID: {}", id, e);
                 if (transaction != null) {
                     transaction.rollback();
+
                 }
+                throw new DatabaseOperationException("Failed to delete match");
             }
-            throw new DatabaseOperationException("Failed to delete match");
         }
     }
 
@@ -101,8 +103,52 @@ public class MatchImpl implements MatchCrud {
             Match existing = session.get(Match.class, id);
             return existing != null;
         } catch (Exception e) {
-            log.warn("Error checking if player exists. ID: {}", id, e);
+            log.warn("Error checking if match exists. ID: {}", id, e);
             return false;
+        }
+    }
+
+    public List<Match> findAllWithPagination(int page, int pageSize) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            int offset = (page - 1) * pageSize;
+            Query<Match> query = session.createQuery(
+                    "FROM Match m ORDER BY m.id DESC", Match.class);
+            query.setFirstResult(offset);
+            query.setMaxResults(pageSize);
+            return query.list();
+        } catch (Exception e) {
+            throw new DatabaseOperationException("Failed to retrieve matches with pagination");
+        }
+    }
+    public List<Match> findAllByPlayerNameWithPagination (Long playerId, int page, int pageSize) {
+        try(Session session = HibernateUtil.getSessionFactory().openSession()) {
+            int offset = (page-1)*pageSize;
+            Query<Match> query = session.createQuery(
+                    "FROM Match m WHERE m.player1.id = :playerId OR m.player2.id = playerId ORDER BY m.id DESC", Match.class);
+            query.setParameter("playerId", playerId);
+            query.setFirstResult(offset);
+            query.setMaxResults(pageSize);
+            return query.list();
+        } catch (Exception e) {
+            throw new DatabaseOperationException("Failed to retrieve matches for player with pagination");
+        }
+    }
+    public Long countMatchForPagination() {
+        try(Session session = HibernateUtil.getSessionFactory().openSession()) {
+            Query<Long> query = session.createQuery("SELECT COUNT (m) FROM Match m", Long.class);
+            return query.uniqueResult();
+        } catch (Exception e) {
+            throw new DatabaseOperationException("Failed to count matches");
+        }
+    }
+    public Long countMatchesForPlayerForPagination(Long playerId) {
+        try(Session session = HibernateUtil.getSessionFactory().openSession()) {
+            Query<Long> query = session.createQuery(
+                    "SELECT COUNT (m) FROM Match m WHERE m.player1.id = :playerId OR m.player2.id = playerId", Long.class);
+            query.setParameter("playerId", playerId);
+            return query.uniqueResult();
+        } catch (Exception e) {
+            throw new DatabaseOperationException("Failed to count matches for player");
         }
     }
 }

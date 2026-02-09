@@ -35,8 +35,16 @@ public class MatchScoreServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String matchId = request.getParameter("uuid");
+        if (matchId==null) {
+            response.sendRedirect(request.getContextPath()+"/");
+            return;
+        }
         UUID uuid = UUID.fromString(matchId);
         CurrentMatch match = ongoingMatchService.getCurrentMatch(uuid);
+        if(match==null) {
+            response.sendRedirect(request.getContextPath()+"/matches");
+            return;
+        }
         Player player1 = playerImpl.findById(match.getIdPlayer1())
                 .orElseThrow();
         Player player2 = playerImpl.findById(match.getIdPlayer2())
@@ -61,8 +69,25 @@ public class MatchScoreServlet extends HttpServlet {
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String playerName = request.getParameter("player");
         String matchIdString = request.getParameter("uuid");
+        if(playerName==null || matchIdString==null){
+            response.sendRedirect(request.getContextPath()+"/");
+            return;
+        }
         UUID matchId = UUID.fromString(matchIdString);
         CurrentMatch match = matchScoreCalculationService.saveMatch(matchId, playerName);
+        if(match==null) {
+            response.sendRedirect(request.getContextPath()+"/matches");
+            return;
+        }
+        boolean matchOver = match.getMatchState().isMatchOver();
+        if(matchOver) {
+            String winner;
+            if(match.getSets1()>match.getSets2()) {
+                winner=playerImpl.findById(match.getIdPlayer1()).orElseThrow().getName();
+            } else  {
+                winner = playerImpl.findById(match.getIdPlayer2()).orElseThrow().getName();
+            }
+        }
         Player player1 = playerImpl.findById(match.getIdPlayer1())
                 .orElseThrow();
         Player player2 = playerImpl.findById(match.getIdPlayer2())
