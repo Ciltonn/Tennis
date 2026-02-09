@@ -1,6 +1,7 @@
 package dao;
 
 import entity.Player;
+import exception.DatabaseOperationException;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -20,7 +21,8 @@ public class PlayerImpl implements PlayerCrud {
             query.setParameter("name", name);
             return Optional.ofNullable(query.uniqueResult());
         } catch (Exception e) {
-            return Optional.empty();
+            log.error("Error finding player by name: {}", name, e);
+            throw new DatabaseOperationException("Player not found by name in database");
         }
     }
 
@@ -30,7 +32,8 @@ public class PlayerImpl implements PlayerCrud {
             Player player = session.get(Player.class, id);
             return Optional.ofNullable(player);
         } catch (Exception e) {
-            return Optional.empty();
+            log.error("Error finding player by ID: {}", id, e);
+            throw new DatabaseOperationException("Player not found by id in database");
         }
     }
 
@@ -43,10 +46,11 @@ public class PlayerImpl implements PlayerCrud {
                 transaction.commit();
                 return player;
             } catch (Exception e) {
+                log.error("Error saving player: {}", player.getName(), e);
                 if (transaction != null) {
                     transaction.rollback();
                 }
-                throw new RuntimeException(e);
+                throw new DatabaseOperationException("Failed to save player in database");
             }
         }
     }
@@ -59,13 +63,18 @@ public class PlayerImpl implements PlayerCrud {
                 Player player = session.get(Player.class, id);
                 if (player != null) {
                     session.remove(player);
+                } else {
+                    log.warn("Player not found for deletion. ID: {}", id);
+                    throw new DatabaseOperationException("Player not found for deletion");
                 }
                 transaction.commit();
             } catch (Exception e) {
+                log.error("Error deleting player with ID: {}", id, e);
                 if (transaction != null) {
                     transaction.rollback();
                 }
-                throw new RuntimeException(e);
+
+                throw new DatabaseOperationException("Failed to delete match");
             }
         }
     }
@@ -77,16 +86,19 @@ public class PlayerImpl implements PlayerCrud {
             try {
                 Player existing = session.get(Player.class, player.getId());
                 if (existing == null) {
+                    log.warn("Player not found for update. ID: {}", player.getId());
                     return Optional.empty();
                 }
                 Player managedPlayer = session.merge(player);
                 transaction.commit();
+                log.info("Player updated successfully. ID: {}", player.getId());
                 return Optional.of(managedPlayer);
             } catch (Exception e) {
+                log.error("Error updating player with ID: {}", player.getId(), e);
                 if (transaction != null) {
                     transaction.rollback();
                 }
-                return Optional.empty();
+                throw new DatabaseOperationException("Failed to update player from database");
             }
         }
     }
@@ -96,7 +108,8 @@ public class PlayerImpl implements PlayerCrud {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             return session.createQuery("FROM Player", Player.class).list();
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            log.error("Error retrieving all players", e);
+            throw new DatabaseOperationException("Failed to retrieve list from database");
         }
     }
 
@@ -106,6 +119,7 @@ public class PlayerImpl implements PlayerCrud {
             Player player = session.get(Player.class, id);
             return player != null;
         } catch (Exception e) {
+            log.warn("Error checking if player exists. ID: {}", id, e);
             return false;
         }
     }

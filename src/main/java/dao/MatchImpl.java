@@ -1,6 +1,8 @@
 package dao;
 
 import entity.Match;
+import exception.DatabaseOperationException;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import util.HibernateUtil;
@@ -8,6 +10,7 @@ import util.HibernateUtil;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 public class MatchImpl implements MatchCrud {
     @Override
     public Optional<Match> findById(Long id) {
@@ -15,7 +18,8 @@ public class MatchImpl implements MatchCrud {
             Match findingMatch = session.get(Match.class, id);
             return Optional.ofNullable(findingMatch);
         } catch (Exception e) {
-            return Optional.empty();
+            log.error("Error finding match by id: {}", id, e);
+            throw new DatabaseOperationException("Match not found in database");
         }
     }
 
@@ -26,11 +30,15 @@ public class MatchImpl implements MatchCrud {
             try {
                 session.persist(match);
                 transaction.commit();
+                return match;
             } catch (Exception e) {
-                transaction.rollback();
+                log.error("Error saving match: {}", match.getId(), e);
+                if (transaction != null) {
+                    transaction.rollback();
+                }
+                throw new DatabaseOperationException("Failed to save match");
             }
         }
-        return match;
     }
 
     @Override
@@ -39,11 +47,21 @@ public class MatchImpl implements MatchCrud {
             Transaction transaction = session.beginTransaction();
             try {
                 Match deletedMatch = session.get(Match.class, id);
-                session.remove(deletedMatch);
-                transaction.commit();
+                if (deletedMatch != null) {
+                    session.remove(deletedMatch);
+                    transaction.commit();
+                } else {
+                    transaction.rollback();
+                    log.warn("Match not found for deletion. ID: {}", id);
+                    throw new DatabaseOperationException("Match not found for deletion");
+                }
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                log.error("Error deleting match with ID: {}", id, e);
+                if (transaction != null) {
+                    transaction.rollback();
+                }
             }
+            throw new DatabaseOperationException("Failed to delete match");
         }
     }
 
@@ -56,11 +74,12 @@ public class MatchImpl implements MatchCrud {
                 transaction.commit();
                 return Optional.ofNullable(match);
             } catch (Exception e) {
+                log.error("Error updating match with ID: {}", match.getId(), e);
                 if (transaction != null) {
                     transaction.rollback();
                 }
+                throw new DatabaseOperationException("Failed to update match from database");
             }
-            return Optional.empty();
         }
     }
 
@@ -71,7 +90,8 @@ public class MatchImpl implements MatchCrud {
             matches = session.createQuery("FROM Match", Match.class).list();
             return matches;
         } catch (Exception e) {
-            return List.of();
+            log.error("Error retrieving all matches", e);
+            throw new DatabaseOperationException("Failed to retrieve list of matches from database");
         }
     }
 
@@ -81,6 +101,7 @@ public class MatchImpl implements MatchCrud {
             Match existing = session.get(Match.class, id);
             return existing != null;
         } catch (Exception e) {
+            log.warn("Error checking if player exists. ID: {}", id, e);
             return false;
         }
     }

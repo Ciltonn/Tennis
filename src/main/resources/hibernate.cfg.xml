@@ -20,10 +20,7 @@
         <!-- Создавать таблицы автоматически при старте -->
         <property name="hibernate.hbm2ddl.auto">create-drop</property>
 
-        <!-- Инициализация базы данных при старте -->
-        <property name="jakarta.persistence.sql-load-script-source">import.sql</property>
-
-        <!-- Размер connection pool -->
+                <!-- Размер connection pool -->
         <property name="hibernate.connection.pool_size">5</property>
 
         <!-- Регистрируем наши сущности -->
