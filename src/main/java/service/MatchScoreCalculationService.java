@@ -92,7 +92,6 @@ public class MatchScoreCalculationService {
 
     private void countingAdvantage(CurrentMatch currentMatch, Long playerId) {
         MatchState state = currentMatch.getMatchState();
-
         if (state.isPlayer1Advantage() && currentMatch.getIdPlayer1().equals(playerId)) {
             state.setPlayer1Advantage(false);
             resetPoints(currentMatch);
@@ -158,9 +157,7 @@ public class MatchScoreCalculationService {
             state.setTieBreak(true);
             resetGamesAndPoints(currentMatch);
             resetMatchState(currentMatch);
-
         }
-
     }
 
     private void resetMatchState(CurrentMatch currentMatch) {
@@ -175,7 +172,6 @@ public class MatchScoreCalculationService {
             currentMatch.setGames1(currentMatch.getGames1() + 1);
         }
         if (playerId.equals(currentMatch.getIdPlayer2())) {
-
             currentMatch.setGames2(currentMatch.getGames2() + 1);
         }
         checkTieBreakOver(currentMatch);
@@ -210,7 +206,6 @@ public class MatchScoreCalculationService {
     private Long getWinner(CurrentMatch currentMatch) {
         int setsPlayer1 = currentMatch.getSets1();
         int setsPlayer2 = currentMatch.getSets2();
-
         if (currentMatch.getMatchState().isMatchOver()) {
             if (setsPlayer1 > setsPlayer2) {
                 return currentMatch.getIdPlayer1();

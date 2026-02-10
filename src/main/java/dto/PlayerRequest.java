@@ -10,5 +10,5 @@ import lombok.NoArgsConstructor;
 
 public class PlayerRequest {
 
-    private String name;
+      private String name;
 }

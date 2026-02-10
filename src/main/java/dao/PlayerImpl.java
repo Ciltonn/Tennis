@@ -73,7 +73,6 @@ public class PlayerImpl implements PlayerCrud {
                 if (transaction != null) {
                     transaction.rollback();
                 }
-
                 throw new DatabaseOperationException("Failed to delete match");
             }
         }
@@ -110,17 +109,6 @@ public class PlayerImpl implements PlayerCrud {
         } catch (Exception e) {
             log.error("Error retrieving all players", e);
             throw new DatabaseOperationException("Failed to retrieve list from database");
-        }
-    }
-
-    @Override
-    public boolean existsById(Long id) {
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            Player player = session.get(Player.class, id);
-            return player != null;
-        } catch (Exception e) {
-            log.warn("Error checking if player exists. ID: {}", id, e);
-            return false;
         }
     }
 }

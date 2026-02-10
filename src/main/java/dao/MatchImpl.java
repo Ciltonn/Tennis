@@ -97,18 +97,7 @@ public class MatchImpl implements MatchCrud {
         }
     }
 
-    @Override
-    public boolean existsById(Long id) {
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            Match existing = session.get(Match.class, id);
-            return existing != null;
-        } catch (Exception e) {
-            log.warn("Error checking if match exists. ID: {}", id, e);
-            return false;
-        }
-    }
-
-    public List<Match> findAllWithPagination(int page, int pageSize) {
+       public List<Match> findAllWithPagination(int page, int pageSize) {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             int offset = (page - 1) * pageSize;
             Query<Match> query = session.createQuery(
@@ -120,11 +109,12 @@ public class MatchImpl implements MatchCrud {
             throw new DatabaseOperationException("Failed to retrieve matches with pagination");
         }
     }
+
     public List<Match> findAllByPlayerNameWithPagination (Long playerId, int page, int pageSize) {
         try(Session session = HibernateUtil.getSessionFactory().openSession()) {
             int offset = (page-1)*pageSize;
             Query<Match> query = session.createQuery(
-                    "FROM Match m WHERE m.player1.id = :playerId OR m.player2.id = playerId ORDER BY m.id DESC", Match.class);
+                    "FROM Match m WHERE m.player1.id = :playerId OR m.player2.id = :playerId ORDER BY m.id DESC", Match.class);
             query.setParameter("playerId", playerId);
             query.setFirstResult(offset);
             query.setMaxResults(pageSize);
@@ -144,7 +134,7 @@ public class MatchImpl implements MatchCrud {
     public Long countMatchesForPlayerForPagination(Long playerId) {
         try(Session session = HibernateUtil.getSessionFactory().openSession()) {
             Query<Long> query = session.createQuery(
-                    "SELECT COUNT (m) FROM Match m WHERE m.player1.id = :playerId OR m.player2.id = playerId", Long.class);
+                    "SELECT COUNT (m) FROM Match m WHERE m.player1.id = :playerId OR m.player2.id = :playerId", Long.class);
             query.setParameter("playerId", playerId);
             return query.uniqueResult();
         } catch (Exception e) {

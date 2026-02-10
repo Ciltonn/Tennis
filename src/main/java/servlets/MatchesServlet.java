@@ -10,8 +10,10 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import service.MatchesService;
+
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 
 @WebServlet("/matches")
@@ -28,12 +30,23 @@ public class MatchesServlet extends HttpServlet {
         this.matchesService = new MatchesService(match, player);
     }
 
-
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException,IOException {
-    List<Match> matches = matchesService.getMatches();
-    request.setAttribute("matches", matches);
-    request.getRequestDispatcher("/matches.jsp").forward(request, response);
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        int page = Optional.ofNullable(request.getParameter("page")).map(Integer::parseInt).orElse(1) ;
+        String filterByPlayerName = request.getParameter("filter_by_player_name");
+
+        List<Match> matches = matchesService.getMatches(filterByPlayerName,page, PAGE_SIZE);
+        Long totalMatches = matchesService.getTotalMatchesCount();
+        int totalPages =1;
+        totalPages = (int) Math.ceil((double) totalMatches/PAGE_SIZE);
+        request.setAttribute("matches", matches);
+        request.setAttribute("Page", page);
+        request.setAttribute("totalPages", totalPages);
+        request.setAttribute("pageSize", PAGE_SIZE);
+        request.setAttribute("totalMatch", totalMatches);
+        request.setAttribute("filter_by_name", filterByPlayerName);
+
+        request.getRequestDispatcher("/matches.jsp").forward(request, response);
 
 
     }

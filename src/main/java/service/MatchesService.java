@@ -18,29 +18,20 @@ public class MatchesService {
         this.player = player;
     }
 
-    public List<Match> getMatches() {
-        return match.findAll();
-    }
+    public List<Match> getMatches(String playerName, int page, int pageSize) {
 
-    public List<Match> getMatchByPlayerName(String playerName, int page, int pageSize) {
+        if (playerName == null) {
+            return match.findAllWithPagination(page, pageSize);
+        }
         Optional<Player> playerForFind = player.findByName(playerName);
-        if (playerForFind.isEmpty()) {
+        if(playerForFind.isEmpty()) {
             return new ArrayList<>();
         }
         Long playerId = playerForFind.get().getId();
         return match.findAllByPlayerNameWithPagination(playerId, page, pageSize);
-    }
+        }
 
     public Long getTotalMatchesCount() {
         return match.countMatchForPagination();
     }
-
-    public long getMatchesCountByPlayer(String playerName) {
-        Optional<Player> playerForFind = player.findByName(playerName);
-        if (playerForFind.isEmpty()) {
-            return 0;
-        }
-        Long playerId = playerForFind.get().getId();
-        return match.countMatchesForPlayerForPagination(playerId);
-    }
-}
+  }

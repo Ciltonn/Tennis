@@ -4,6 +4,7 @@ import dao.MatchImpl;
 import dao.PlayerImpl;
 import dto.CurrentMatch;
 import entity.Match;
+import exception.NotFoundException;
 
 
 import java.util.UUID;
@@ -23,9 +24,6 @@ public class FinishedMatchesPersistenceService {
     public void finishMatch(UUID uuid, Long winnerId) {
         try {
             CurrentMatch currentMatch = ongoingMatchService.getCurrentMatch(uuid);
-            if (currentMatch == null) {
-                return;
-            }
             Match match = new Match();
             match.setPlayer1(playerImpl.findById(currentMatch.getIdPlayer1()).orElseThrow());
             match.setPlayer2(playerImpl.findById(currentMatch.getIdPlayer2()).orElseThrow());
@@ -33,7 +31,7 @@ public class FinishedMatchesPersistenceService {
             matchImpl.save(match);
             ongoingMatchService.deleteCurrentMatch(uuid);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new NotFoundException("Match not found");
         }
     }
 }

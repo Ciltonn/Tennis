@@ -14,7 +14,4 @@ public interface CrudDao <T, ID>{
   Optional <T> update(T entity);
 
   List<T> findAll();
-
-   boolean existsById(ID id);
-
 }

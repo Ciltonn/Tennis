@@ -13,6 +13,8 @@ import service.NewMatchService;
 import java.io.IOException;
 import java.util.UUID;
 
+import util.ValidationUtil;
+
 @WebServlet("/new-match")
 public class NewMatchServlet extends HttpServlet {
     private NewMatchService newMatchService;
@@ -33,14 +35,14 @@ public class NewMatchServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         PlayerRequest playerRequest1 = new PlayerRequest();
         playerRequest1.setName(request.getParameter("playerOne"));
+        ValidationUtil.validate(playerRequest1);
         PlayerRequest playerRequest2 = new PlayerRequest();
         playerRequest2.setName(request.getParameter("playerTwo"));
-
+        ValidationUtil.validate(playerRequest2);
+        ValidationUtil.validatePlayers(playerRequest1, playerRequest2);
         CurrentMatch match = newMatchService.createNewMatch(playerRequest1, playerRequest2);
         UUID match_id = match.getMatchId();
-
         String contextPath = request.getContextPath();
-
-        response.sendRedirect(contextPath+"/match-score?uuid=" + match_id);
+        response.sendRedirect(contextPath + "/match-score?uuid=" + match_id);
     }
 }
