@@ -5,9 +5,12 @@ import dto.CurrentMatch;
 import dto.MatchState;
 import dto.TennisPoint;
 import entity.Player;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
+@NoArgsConstructor(force = true,access = AccessLevel.PROTECTED)
 public class MatchScoreCalculationService {
 
     private static final int MIN_POINT_DIFFERENCE = 2;

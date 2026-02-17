@@ -2,6 +2,7 @@ package servlets;
 
 import dto.CurrentMatch;
 import dto.PlayerRequest;
+import exception.InvalidParameterException;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -32,17 +33,24 @@ public class NewMatchServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        PlayerRequest playerRequest1 = new PlayerRequest();
-        playerRequest1.setName(request.getParameter("playerOne"));
-        ValidationUtil.validate(playerRequest1);
-        PlayerRequest playerRequest2 = new PlayerRequest();
-        playerRequest2.setName(request.getParameter("playerTwo"));
-        ValidationUtil.validate(playerRequest2);
-        ValidationUtil.validatePlayers(playerRequest1, playerRequest2);
-        CurrentMatch match = newMatchService.createNewMatch(playerRequest1, playerRequest2);
-        UUID match_id = match.getMatchId();
-        String contextPath = request.getContextPath();
-        response.sendRedirect(contextPath + "/match-score?uuid=" + match_id);
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        String playerOne = request.getParameter("playerOne");
+        String playerTwo = request.getParameter("playerTwo");
+        try {
+            PlayerRequest playerRequest1 = new PlayerRequest();
+            playerRequest1.setName(playerOne);
+            ValidationUtil.validate(playerRequest1);
+            PlayerRequest playerRequest2 = new PlayerRequest();
+            playerRequest2.setName(playerTwo);
+            ValidationUtil.validate(playerRequest2);
+            ValidationUtil.validatePlayers(playerRequest1, playerRequest2);
+            CurrentMatch match = newMatchService.createNewMatch(playerRequest1, playerRequest2);
+            UUID match_id = match.getMatchId();
+            String contextPath = request.getContextPath();
+            response.sendRedirect(contextPath + "/match-score?uuid=" + match_id);
+        } catch (InvalidParameterException e) {
+            request.setAttribute("error", e.getMessage());
+            request.getRequestDispatcher("/new-match.jsp").forward(request, response);
+        }
     }
 }

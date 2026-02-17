@@ -40,11 +40,11 @@ public class MatchesServlet extends HttpServlet {
         int totalPages =1;
         totalPages = (int) Math.ceil((double) totalMatches/PAGE_SIZE);
         request.setAttribute("matches", matches);
-        request.setAttribute("Page", page);
+        request.setAttribute("page", page);
         request.setAttribute("totalPages", totalPages);
         request.setAttribute("pageSize", PAGE_SIZE);
-        request.setAttribute("totalMatch", totalMatches);
-        request.setAttribute("filter_by_name", filterByPlayerName);
+        request.setAttribute("totalMatches", totalMatches);
+        request.setAttribute("filter_by_player_name", filterByPlayerName);
 
         request.getRequestDispatcher("/matches.jsp").forward(request, response);
 

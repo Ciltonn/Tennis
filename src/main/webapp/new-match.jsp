@@ -1,4 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page isELIgnored="false" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <html>
 <head>
@@ -34,8 +35,8 @@
         </div>
         <div>
             <nav class="nav-links">
-                <a class="nav-link" href="/">Home</a>
-                <a class="nav-link" href="/matches">Matches</a>
+                <a class="nav-link" href="{pageContext.request.contextPath}/">Home</a>
+                <a class="nav-link" href="${pageContext.request.contextPath}/matches">Matches</a>
             </nav>
         </div>
     </section>
@@ -46,8 +47,9 @@
             <h1>Start new match</h1>
             <div class="new-match-image"></div>
             <div class="form-container center">
+
                 <form method="post" action="new-match">
-                    <p style="color: red;">Sample error message</p>
+                    <p style="color: red;">${error}</p>
                     <label class="label-player" for="playerOne">Player one</label>
                     <input class="input-player" id="playerOne" name="playerOne" placeholder="name" type="text" required title="Enter a name">
 

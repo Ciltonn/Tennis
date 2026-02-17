@@ -56,10 +56,20 @@ public class MatchScoreServlet extends HttpServlet {
             String winner;
             if (match.getSets1() > match.getSets2()) {
                 winner = playerImpl.findById(match.getIdPlayer1()).orElseThrow().getName();
+
             } else {
                 winner = playerImpl.findById(match.getIdPlayer2()).orElseThrow().getName();
+
             }
+            String player1name = playerImpl.findById(match.getIdPlayer1()).orElseThrow().getName();
+            String player2name = playerImpl.findById( match.getIdPlayer2()).orElseThrow().getName();
+            request.setAttribute("winner", winner);
+            request.setAttribute("player1Name", player1name);
+            request.setAttribute("player2Name",player2name);
+            request.getRequestDispatcher("/match-result.jsp").forward(request, response);
+            return;
         }
+
         setAttribute(request, match);
         request.setAttribute("matchId", match.getMatchId().toString());
         request.getRequestDispatcher("/match-score.jsp").forward(request, response);

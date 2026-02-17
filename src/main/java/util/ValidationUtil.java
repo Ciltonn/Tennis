@@ -9,6 +9,9 @@ public final class ValidationUtil {
     private static final Pattern NAME_PATTERN =
             Pattern.compile("^[a-zA-Zа-яА-ЯёЁ\\s\\-'.]+$");
     public static void validate(PlayerRequest playerRequest) {
+        if (playerRequest == null) {
+            throw new InvalidParameterException("Player request cannot be null");
+        }
                 String playerName = playerRequest.getName();
         if (playerName == null) {
             throw new InvalidParameterException("Missing parameter - name");
@@ -21,6 +24,9 @@ public final class ValidationUtil {
         }
     }
     public static void validatePlayers(PlayerRequest playerRequest1, PlayerRequest playerRequest2) {
+        if (playerRequest1 == null || playerRequest2 == null) {
+            throw new InvalidParameterException("Player requests cannot be null");
+        }
         String playerName1 = playerRequest1.getName().trim();
         String playerName2 = playerRequest2.getName().trim();
         if(playerName1.equalsIgnoreCase(playerName2)) {
