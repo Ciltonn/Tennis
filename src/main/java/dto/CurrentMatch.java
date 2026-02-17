@@ -7,6 +7,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Getter
 @Setter
+@Builder
 
 public class CurrentMatch {
     private UUID matchId;
