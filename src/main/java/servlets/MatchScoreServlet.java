@@ -10,8 +10,10 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import service.FinishedMatchesPersistenceService;
 import service.MatchScoreCalculationService;
 import service.OngoingMatchService;
+import service.PlayerService;
 
 import java.io.IOException;
 import java.util.UUID;
@@ -21,6 +23,8 @@ public class MatchScoreServlet extends HttpServlet {
     private OngoingMatchService ongoingMatchService;
     private PlayerImpl playerImpl;
     private MatchScoreCalculationService matchScoreCalculationService;
+    private PlayerService playerService;
+    private FinishedMatchesPersistenceService finishedMatchesPersistenceService;
 
     @Override
     public void init() throws ServletException {
@@ -29,6 +33,8 @@ public class MatchScoreServlet extends HttpServlet {
         this.ongoingMatchService = (OngoingMatchService) context.getAttribute("ongoingMatchService");
         this.playerImpl = (PlayerImpl) context.getAttribute("player");
         this.matchScoreCalculationService = (MatchScoreCalculationService) context.getAttribute("matchScoreCalculationService");
+        this.playerService = (PlayerService) context.getAttribute("playerService");
+        this.finishedMatchesPersistenceService = (FinishedMatchesPersistenceService) context.getAttribute("finishedMatchesPersistenceService");
     }
 
     @Override
@@ -50,9 +56,11 @@ public class MatchScoreServlet extends HttpServlet {
         String playerName = request.getParameter("player");
         String matchIdString = request.getParameter("uuid");
         UUID matchId = UUID.fromString(matchIdString);
-        CurrentMatch match = matchScoreCalculationService.saveMatch(matchId, playerName);
+        Long playerId = playerService.convertNamePlayerToId(playerName);
+        CurrentMatch match = matchScoreCalculationService.calculateScore(matchId, playerId);
         boolean matchOver = match.getMatchState().isMatchOver();
         if (matchOver) {
+            finishedMatchesPersistenceService.finishMatch(match.getMatchId());
             String winner;
             if (match.getSets1() > match.getSets2()) {
                 winner = playerImpl.findById(match.getIdPlayer1()).orElseThrow().getName();
@@ -62,17 +70,17 @@ public class MatchScoreServlet extends HttpServlet {
 
             }
             String player1name = playerImpl.findById(match.getIdPlayer1()).orElseThrow().getName();
-            String player2name = playerImpl.findById( match.getIdPlayer2()).orElseThrow().getName();
+            String player2name = playerImpl.findById(match.getIdPlayer2()).orElseThrow().getName();
             request.setAttribute("winner", winner);
             request.setAttribute("player1Name", player1name);
-            request.setAttribute("player2Name",player2name);
+            request.setAttribute("player2Name", player2name);
             request.getRequestDispatcher("/match-result.jsp").forward(request, response);
-            return;
-        }
 
-        setAttribute(request, match);
-        request.setAttribute("matchId", match.getMatchId().toString());
-        request.getRequestDispatcher("/match-score.jsp").forward(request, response);
+        } else {
+            setAttribute(request, match);
+            request.setAttribute("matchId", match.getMatchId().toString());
+            request.getRequestDispatcher("/match-score.jsp").forward(request, response);
+        }
     }
 
     public void setAttribute(HttpServletRequest request, CurrentMatch match) {

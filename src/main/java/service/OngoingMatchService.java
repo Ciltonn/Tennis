@@ -1,12 +1,12 @@
 package service;
 
 import dto.CurrentMatch;
-
-import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class OngoingMatchService {
-    public static final HashMap<UUID, CurrentMatch> currentMatches = new HashMap<>();
+    public static final Map<UUID, CurrentMatch> currentMatches = new ConcurrentHashMap<>();
 
     public CurrentMatch getCurrentMatch(UUID match_id) {
         return currentMatches.get(match_id);

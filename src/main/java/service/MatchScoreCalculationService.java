@@ -1,47 +1,27 @@
 package service;
-
-import dao.PlayerImpl;
 import dto.CurrentMatch;
 import dto.MatchState;
 import dto.TennisPoint;
-import entity.Player;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
-@NoArgsConstructor(force = true,access = AccessLevel.PROTECTED)
+
 public class MatchScoreCalculationService {
 
     private static final int MIN_POINT_DIFFERENCE = 2;
     private static final int MIN_GAMES_TO_WIN_TIEBREAK = 7;
     private static final int MIN_GAMES_TO_WIN_SET = 6;
     private static final int SETS_TO_WIN_MATCH = 2;
-
     private final OngoingMatchService ongoingMatchService;
-    private final PlayerImpl playerImpl;
-    private final FinishedMatchesPersistenceService finishedMatchesPersistenceService;
 
-    public MatchScoreCalculationService(PlayerImpl playerImpl, FinishedMatchesPersistenceService finishedMatchesPersistenceService, OngoingMatchService ongoingMatchService) {
-        this.playerImpl = playerImpl;
-        this.finishedMatchesPersistenceService = finishedMatchesPersistenceService;
-        this.ongoingMatchService = ongoingMatchService;
+    public MatchScoreCalculationService(OngoingMatchService ongoingMatchService) {
+       this.ongoingMatchService = ongoingMatchService;
     }
 
-    public CurrentMatch saveMatch(UUID uuid, String playerName) {
-        CurrentMatch currentMatch = calculateScore(uuid, playerName);
-        MatchState state = currentMatch.getMatchState();
-        if (state.isMatchOver()) {
-            Long winnerId = getWinner(currentMatch);
-            finishedMatchesPersistenceService.finishMatch(uuid, winnerId);
-        }
-        return currentMatch;
-    }
-
-    private CurrentMatch calculateScore(UUID uuid, String playerName) {
+       public CurrentMatch calculateScore(UUID uuid, Long playerId) {
         CurrentMatch currentMatch = ongoingMatchService.getCurrentMatch(uuid);
-        Player player = playerImpl.findByName(playerName).orElseThrow();
-        Long playerId = player.getId();
         MatchState state = currentMatch.getMatchState();
         if (!state.isMatchOver()) {
             if (!state.isTieBreak()) {
@@ -59,7 +39,8 @@ public class MatchScoreCalculationService {
             }
             checkMatchOver(currentMatch);
         }
-               return currentMatch;
+
+        return currentMatch;
     }
 
     private void countingGame(CurrentMatch currentMatch, Long playerId) {
@@ -204,19 +185,6 @@ public class MatchScoreCalculationService {
                 || currentMatch.getSets2() >= SETS_TO_WIN_MATCH) {
             state.setMatchOver(true);
         }
-    }
-
-    private Long getWinner(CurrentMatch currentMatch) {
-        int setsPlayer1 = currentMatch.getSets1();
-        int setsPlayer2 = currentMatch.getSets2();
-        if (currentMatch.getMatchState().isMatchOver()) {
-            if (setsPlayer1 > setsPlayer2) {
-                return currentMatch.getIdPlayer1();
-            } else if (setsPlayer2 > setsPlayer1) {
-                return currentMatch.getIdPlayer2();
-            }
-        }
-        throw new IllegalStateException("Match is't finished");
     }
 
     private void resetGamesAndPoints(CurrentMatch currentMatch) {
