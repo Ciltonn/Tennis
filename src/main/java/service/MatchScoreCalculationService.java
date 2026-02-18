@@ -1,4 +1,5 @@
 package service;
+
 import dto.CurrentMatch;
 import dto.MatchState;
 import dto.TennisPoint;
@@ -17,22 +18,20 @@ public class MatchScoreCalculationService {
     private final OngoingMatchService ongoingMatchService;
 
     public MatchScoreCalculationService(OngoingMatchService ongoingMatchService) {
-       this.ongoingMatchService = ongoingMatchService;
+        this.ongoingMatchService = ongoingMatchService;
     }
 
-       public CurrentMatch calculateScore(UUID uuid, Long playerId) {
+    public CurrentMatch calculateScore(UUID uuid, Long playerId) {
         CurrentMatch currentMatch = ongoingMatchService.getCurrentMatch(uuid);
         MatchState state = currentMatch.getMatchState();
         if (!state.isMatchOver()) {
             if (!state.isTieBreak()) {
-                if (!state.isDeuce()) {
-                    if (!state.isPlayer1Advantage() && !state.isPlayer2Advantage()) {
-                        countingGame(currentMatch, playerId);
-                    } else {
-                        countingAdvantage(currentMatch, playerId);
-                    }
-                } else {
+                if (state.isDeuce()) {
                     countingDeuce(currentMatch, playerId);
+                } else if (state.isPlayer1Advantage() && state.isPlayer2Advantage()) {
+                    countingAdvantage(currentMatch, playerId);
+                } else {
+                    countingGame(currentMatch, playerId);
                 }
             } else {
                 countingTieBreak(currentMatch, playerId);
@@ -46,10 +45,17 @@ public class MatchScoreCalculationService {
     private void countingGame(CurrentMatch currentMatch, Long playerId) {
         if (playerId.equals(currentMatch.getIdPlayer1())) {
             TennisPoint tennisPoint = currentMatch.getPoints1();
+            if(!(currentMatch.getPoints1()==TennisPoint.FORTY &&
+            currentMatch.getPoints2()==TennisPoint.FORTY)) {
             currentMatch.setPoints1(tennisPoint.getNextValuePoints());
+            }
         } else {
             TennisPoint tennisPoint = currentMatch.getPoints2();
-            currentMatch.setPoints2(tennisPoint.getNextValuePoints());
+            if(!(currentMatch.getPoints2()==TennisPoint.FORTY &&
+                    currentMatch.getPoints1()==TennisPoint.FORTY)) {
+                currentMatch.setPoints2(tennisPoint.getNextValuePoints());
+            }
+
         }
         checkDeuce(currentMatch);
         checkGameWin(currentMatch, playerId);
@@ -139,7 +145,7 @@ public class MatchScoreCalculationService {
                 currentMatch.getGames2() == MIN_GAMES_TO_WIN_SET) {
             MatchState state = currentMatch.getMatchState();
             state.setTieBreak(true);
-            resetGamesAndPoints(currentMatch);
+            resetPoints(currentMatch);
             resetMatchState(currentMatch);
         }
     }
@@ -171,8 +177,6 @@ public class MatchScoreCalculationService {
                 currentMatch.setSets2(currentMatch.getSets2() + 1);
             }
             currentMatch.getMatchState().setTieBreak(false);
-            currentMatch.setGames1(0);
-            currentMatch.setGames2(0);
             resetGamesAndPoints(currentMatch);
             resetMatchState(currentMatch);
             checkMatchOver(currentMatch);
