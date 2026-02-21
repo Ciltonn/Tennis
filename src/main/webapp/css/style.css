@@ -449,7 +449,7 @@ footer {
     margin-bottom: 20px;
     border-collapse: collapse;
     border: 1px solid #ccc;
-}
+    }
 
 .table-matches th {
     font-weight: bold;
@@ -463,6 +463,10 @@ footer {
     border-bottom: 1px solid #dddddd;
     padding: 51px 0;
     text-align: center;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    max-width: 200px;
 }
 
 .table-matches tr td:first-child, .table-matches tr th:first-child {
@@ -479,6 +483,9 @@ footer {
     width: 38%;
     margin: 0 auto;
     border-radius: 18px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 .prev, .next {

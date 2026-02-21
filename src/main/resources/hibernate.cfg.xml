@@ -4,26 +4,15 @@
         "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
 <hibernate-configuration>
     <session-factory>
-        <!-- Настройки H2 -->
         <property name="hibernate.connection.driver_class">org.h2.Driver</property>
         <property name="hibernate.connection.url">jdbc:h2:mem:tennis;DB_CLOSE_DELAY=-1</property>
         <property name="hibernate.connection.username">sa</property>
         <property name="hibernate.connection.password"></property>
-
-        <!-- Диалект для H2 -->
         <property name="hibernate.dialect">org.hibernate.dialect.H2Dialect</property>
-
-        <!-- Показывать SQL в консоли (удобно для отладки) -->
         <property name="hibernate.show_sql">true</property>
         <property name="hibernate.format_sql">true</property>
-
-        <!-- Создавать таблицы автоматически при старте -->
         <property name="hibernate.hbm2ddl.auto">create-drop</property>
-
-                <!-- Размер connection pool -->
         <property name="hibernate.connection.pool_size">5</property>
-
-        <!-- Регистрируем наши сущности -->
         <mapping class="entity.Player"/>
         <mapping class="entity.Match"/>
     </session-factory>

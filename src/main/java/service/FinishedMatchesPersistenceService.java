@@ -26,8 +26,8 @@ public class FinishedMatchesPersistenceService {
         try {
             CurrentMatch currentMatch = ongoingMatchService.getCurrentMatch(uuid);
             Match match = new Match();
-            match.setPlayer1(playerImpl.findById(currentMatch.getIdPlayer1()).orElseThrow());
-            match.setPlayer2(playerImpl.findById(currentMatch.getIdPlayer2()).orElseThrow());
+            match.setPlayerFirst(playerImpl.findById(currentMatch.getIdPlayer1()).orElseThrow());
+            match.setPlayerSecond(playerImpl.findById(currentMatch.getIdPlayer2()).orElseThrow());
             match.setWinner(getWinner(currentMatch));
             matchImpl.save(match);
             ongoingMatchService.deleteCurrentMatch(uuid);

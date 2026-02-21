@@ -50,8 +50,8 @@
                 <c:when test="${not empty matches}">
                     <c:forEach var="match" items="${matches}">
                         <tr>
-                            <td>${match.player1.name}</td>
-                            <td>${match.player2.name}</td>
+                            <td>${match.playerFirst.name}</td>
+                            <td>${match.playerSecond.name}</td>
                             <td><span class="winner-name-td">${match.winner.name}</span></td>
                         </tr>
                     </c:forEach>

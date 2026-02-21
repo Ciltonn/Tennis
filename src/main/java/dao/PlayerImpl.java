@@ -42,7 +42,7 @@ public class PlayerImpl implements PlayerCrud {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             Transaction transaction = session.beginTransaction();
             try {
-                session.merge(player);
+                session.persist(player);
                 transaction.commit();
                 return player;
             } catch (Exception e) {

@@ -16,8 +16,8 @@ public final class ValidationUtil {
         if (playerName == null) {
             throw new InvalidParameterException("Missing parameter - name");
         }
-        if (playerName.length() < 2 || playerName.length() > 40) {
-            throw new InvalidParameterException("Player name cannot be less 2 characters and more 50 characters");
+        if (playerName.length() < 2 || playerName.length() > 30) {
+            throw new InvalidParameterException("Player name cannot be less 2 characters and more 30 characters");
         }
         if(!NAME_PATTERN.matcher(playerName).matches()) {
             throw new InvalidParameterException("Use only English or Russian letters");

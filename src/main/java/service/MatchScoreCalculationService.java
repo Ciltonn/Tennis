@@ -3,8 +3,6 @@ package service;
 import dto.CurrentMatch;
 import dto.MatchState;
 import dto.TennisPoint;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
@@ -28,7 +26,7 @@ public class MatchScoreCalculationService {
             if (!state.isTieBreak()) {
                 if (state.isDeuce()) {
                     countingDeuce(currentMatch, playerId);
-                } else if (state.isPlayer1Advantage() && state.isPlayer2Advantage()) {
+                } else if (state.isPlayer1Advantage() || state.isPlayer2Advantage()) {
                     countingAdvantage(currentMatch, playerId);
                 } else {
                     countingGame(currentMatch, playerId);

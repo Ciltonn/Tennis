@@ -29,7 +29,7 @@ public class MatchImpl implements MatchCrud {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             Transaction transaction = session.beginTransaction();
             try {
-                session.merge(match);
+                session.persist(match);
                 transaction.commit();
                 return match;
             } catch (Exception e) {
