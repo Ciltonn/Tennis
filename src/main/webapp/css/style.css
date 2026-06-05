@@ -514,3 +514,20 @@ footer {
 .num-page.current {
     font-weight: bold;
 }
+.btn-reset {
+    display: inline-block;
+    line-height: 45px;
+    margin-left: 10px;
+    padding: 0 20px;
+    border-radius: 18px;
+    background-color: #e7e7e7;
+    color: #000;
+    text-decoration: none;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-reset:hover {
+    background-color: #d5d5d5;
+}

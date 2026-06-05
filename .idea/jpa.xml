@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="PersistenceUnitSettings">
+    <persistence-units>
+      <persistence-unit name="hibernate.cfg.xml" framework="JPA" ormUnit="custom_pu_1773214791652" defaultDataSourceId="df63b4c1-faee-4489-a067-25094ae2c0c7" />
+    </persistence-units>
+  </component>
+</project>

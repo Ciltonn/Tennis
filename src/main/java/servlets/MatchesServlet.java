@@ -2,7 +2,7 @@ package servlets;
 
 import dao.MatchImpl;
 import dao.PlayerImpl;
-import entity.Match;
+import entity.TennisMatch;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -35,7 +35,7 @@ public class MatchesServlet extends HttpServlet {
         int page = Optional.ofNullable(request.getParameter("page")).map(Integer::parseInt).orElse(1) ;
         String filterByPlayerName = request.getParameter("filter_by_player_name");
 
-        List<Match> matches = matchesService.getMatches(filterByPlayerName,page, PAGE_SIZE);
+        List<TennisMatch> matches = matchesService.getMatches(filterByPlayerName,page, PAGE_SIZE);
         Long totalMatches = matchesService.getTotalMatchesCount();
         int totalPages =1;
         totalPages = (int) Math.ceil((double) totalMatches/PAGE_SIZE);

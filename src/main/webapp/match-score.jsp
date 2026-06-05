@@ -52,7 +52,7 @@
                     <td class="table-text">${player1Name}</td>
                     <td class="table-text">${sets1}</td>
                     <td class="table-text">${games1}</td>
-                    <td class="table-text">${points1.getValuePoints()}</td>
+                    <td class="table-text">${points1}</td>
                     <td class="table-text">
                         <div class="action-container">
                         <form action="${pageContext.request.contextPath}/match-score" method="post" class="point-form">
@@ -67,7 +67,7 @@
                     <td class="table-text">${player2Name}</td>
                     <td class="table-text">${sets2}</td>
                     <td class="table-text">${games2}</td>
-                    <td class="table-text">${points2.getValuePoints()}</td>
+                    <td class="table-text">${points2}</td>
                     <td class="table-text">
                         <div class="action-container">
                          <form action="${pageContext.request.contextPath}/match-score" method="post" class="point-form">

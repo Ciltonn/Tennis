@@ -2,14 +2,16 @@ package service;
 
 import dao.MatchImpl;
 import dao.PlayerImpl;
-import dto.CurrentMatch;
-import entity.Match;
+import model.CurrentMatch;
+import entity.TennisMatch;
 import entity.Player;
+import exception.DatabaseOperationException;
 import exception.NotFoundException;
+import lombok.extern.slf4j.Slf4j;
 
 
 import java.util.UUID;
-
+@Slf4j
 public class FinishedMatchesPersistenceService {
 
     private final OngoingMatchService ongoingMatchService;
@@ -25,15 +27,25 @@ public class FinishedMatchesPersistenceService {
     public void finishMatch(UUID uuid) {
         try {
             CurrentMatch currentMatch = ongoingMatchService.getCurrentMatch(uuid);
-            Match match = new Match();
-            match.setPlayerFirst(playerImpl.findById(currentMatch.getIdPlayer1()).orElseThrow());
-            match.setPlayerSecond(playerImpl.findById(currentMatch.getIdPlayer2()).orElseThrow());
-            match.setWinner(getWinner(currentMatch));
+            if(currentMatch==null) {
+                throw new NotFoundException("Match not found");
+            }
+            if (!currentMatch.getMatchState().isMatchOver()) {
+                throw new IllegalStateException("Cannot finish unfinished match");
+            }
+            Player firstPlayer = playerImpl.findById(currentMatch.getIdPlayer1()).
+                    orElseThrow(()-> new NotFoundException("Player not found"));
+
+            Player secondPlayer = playerImpl.findById(currentMatch.getIdPlayer2()).
+                    orElseThrow(()-> new NotFoundException("Player not found"));
+            Player winner = getWinner(currentMatch);
+            TennisMatch match = new TennisMatch(firstPlayer, secondPlayer, winner);
             matchImpl.save(match);
             ongoingMatchService.deleteCurrentMatch(uuid);
 
         } catch (Exception e) {
-            throw new NotFoundException("Match not found");
+            log.error("Failed to finish match {}: {}", uuid, e.getMessage(), e);
+            throw new DatabaseOperationException("Failed to save finished match");
         }
     }
 

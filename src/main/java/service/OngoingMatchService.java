@@ -1,6 +1,6 @@
 package service;
 
-import dto.CurrentMatch;
+import model.CurrentMatch;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;

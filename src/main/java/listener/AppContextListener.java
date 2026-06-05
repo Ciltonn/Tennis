@@ -2,7 +2,7 @@ package listener;
 
 import dao.MatchImpl;
 import dao.PlayerImpl;
-import dto.CurrentMatch;
+import model.CurrentMatch;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;

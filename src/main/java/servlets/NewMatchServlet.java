@@ -1,6 +1,6 @@
 package servlets;
 
-import dto.CurrentMatch;
+import model.CurrentMatch;
 import dto.PlayerRequest;
 import exception.InvalidParameterException;
 import jakarta.servlet.ServletContext;

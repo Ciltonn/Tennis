@@ -2,7 +2,7 @@ package service;
 
 import dao.MatchImpl;
 import dao.PlayerImpl;
-import entity.Match;
+import entity.TennisMatch;
 import entity.Player;
 
 import java.util.ArrayList;
@@ -18,7 +18,7 @@ public class MatchesService {
         this.player = player;
     }
 
-    public List<Match> getMatches(String playerName, int page, int pageSize) {
+    public List<TennisMatch> getMatches(String playerName, int page, int pageSize) {
 
         if (playerName == null) {
             return match.findAllWithPagination(page, pageSize);

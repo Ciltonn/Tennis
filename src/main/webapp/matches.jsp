@@ -31,11 +31,13 @@
 
         <form action="${pageContext.request.contextPath}/matches" method="get" class="input-container">
             <input class="input-filter"
-                   placeholder="Filter by player name"
+                   placeholder="Enter player name"
                    type="text"
                    name="filter_by_player_name"
                    value="${param.filter_by_player_name}" />
+
             <button type="submit" class="btn-filter">Apply</button>
+            <button type="button" class="btn-reset" id="resetBtn">Reset</button>
 
         </form>
 
@@ -50,8 +52,8 @@
                 <c:when test="${not empty matches}">
                     <c:forEach var="match" items="${matches}">
                         <tr>
-                            <td>${match.playerFirst.name}</td>
-                            <td>${match.playerSecond.name}</td>
+                            <td>${match.firstPlayer.name}</td>
+                            <td>${match.secondPlayer.name}</td>
                             <td><span class="winner-name-td">${match.winner.name}</span></td>
                         </tr>
                     </c:forEach>

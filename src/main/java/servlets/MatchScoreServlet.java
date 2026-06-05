@@ -1,7 +1,7 @@
 package servlets;
 
 import dao.PlayerImpl;
-import dto.CurrentMatch;
+import model.CurrentMatch;
 import entity.Player;
 import exception.NotFoundException;
 import jakarta.servlet.ServletContext;

@@ -1,10 +1,9 @@
 package service;
 
 import dao.PlayerImpl;
-import dto.MatchState;
 import dto.PlayerRequest;
-import dto.CurrentMatch;
-import dto.TennisPoint;
+import model.CurrentMatch;
+import model.TennisPoint;
 import entity.Player;
 
 import java.util.UUID;
@@ -19,20 +18,19 @@ public class NewMatchService {
     }
 
     public CurrentMatch createNewMatch(PlayerRequest player1, PlayerRequest player2) {
-        Player playerOne = creatOrSavePlayer(player1);
-        Player playerTwo = creatOrSavePlayer(player2);
+        Player playerOne = createOrSavePlayer(player1);
+        Player playerTwo = createOrSavePlayer(player2);
         UUID matchId = UUID.randomUUID();
         CurrentMatch currentNewMatch = new CurrentMatch(matchId, playerOne.getId(), playerTwo.getId(), 0, 0, TennisPoint.ZERO, 0, 0, TennisPoint.ZERO, new MatchState());
         currentMatches.put(matchId, currentNewMatch);
         return currentNewMatch;
     }
 
-    public Player creatOrSavePlayer(PlayerRequest playerRequest) {
-        Player player = playerImpl.findByName(playerRequest.getName()).orElse(null);
+    public Player createOrSavePlayer(PlayerRequest playerRequest) {
+        Player player = playerImpl.findByName(playerRequest.getName().trim()).orElse(null);
         if (player == null) {
-            player = new Player();
-            player.setName(playerRequest.getName());
-            player = playerImpl.save(player);
+            Player newPlayer=new Player(playerRequest.getName());
+            player = playerImpl.save(newPlayer);
         }
         return player;
     }

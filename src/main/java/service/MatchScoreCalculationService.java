@@ -1,18 +1,18 @@
 package service;
 
-import dto.CurrentMatch;
-import dto.MatchState;
-import dto.TennisPoint;
+import model.CurrentMatch;
+import model.MatchState;
+import model.TennisPoint;
 
 import java.util.UUID;
 
 
 public class MatchScoreCalculationService {
 
-    private static final int MIN_POINT_DIFFERENCE = 2;
-    private static final int MIN_GAMES_TO_WIN_TIEBREAK = 7;
-    private static final int MIN_GAMES_TO_WIN_SET = 6;
-    private static final int SETS_TO_WIN_MATCH = 2;
+//    private static final int MIN_POINT_DIFFERENCE = 2;
+//    private static final int MIN_GAMES_TO_WIN_TIEBREAK = 7;
+//    private static final int MIN_GAMES_TO_WIN_SET = 6;
+//    private static final int SETS_TO_WIN_MATCH = 2;
     private final OngoingMatchService ongoingMatchService;
 
     public MatchScoreCalculationService(OngoingMatchService ongoingMatchService) {
@@ -21,12 +21,11 @@ public class MatchScoreCalculationService {
 
     public CurrentMatch calculateScore(UUID uuid, Long playerId) {
         CurrentMatch currentMatch = ongoingMatchService.getCurrentMatch(uuid);
-        MatchState state = currentMatch.getMatchState();
-        if (!state.isMatchOver()) {
-            if (!state.isTieBreak()) {
-                if (state.isDeuce()) {
+        if (!currentMatch.getMatchState().equals(MatchState.MATCH_OVER)) {
+            if (!currentMatch.getMatchState().equals(MatchState.TIE_BREAK)) {
+                if (currentMatch.getMatchState().equals(MatchState.DEUCE)) {
                     countingDeuce(currentMatch, playerId);
-                } else if (state.isPlayer1Advantage() || state.isPlayer2Advantage()) {
+                } else if (currentMatch.getMatchState().equals(MatchState.ADVANTAGE)) {
                     countingAdvantage(currentMatch, playerId);
                 } else {
                     countingGame(currentMatch, playerId);
@@ -45,13 +44,13 @@ public class MatchScoreCalculationService {
             TennisPoint tennisPoint = currentMatch.getPoints1();
             if(!(currentMatch.getPoints1()==TennisPoint.FORTY &&
             currentMatch.getPoints2()==TennisPoint.FORTY)) {
-            currentMatch.setPoints1(tennisPoint.getNextValuePoints());
+            currentMatch.setPoints1(tennisPoint.next());
             }
         } else {
             TennisPoint tennisPoint = currentMatch.getPoints2();
             if(!(currentMatch.getPoints2()==TennisPoint.FORTY &&
                     currentMatch.getPoints1()==TennisPoint.FORTY)) {
-                currentMatch.setPoints2(tennisPoint.getNextValuePoints());
+                currentMatch.setPoints2(tennisPoint.next());
             }
 
         }
@@ -63,13 +62,13 @@ public class MatchScoreCalculationService {
         MatchState state = currentMatch.getMatchState();
         if (!state.isDeuce() && !state.isPlayer1Advantage() && !state.isPlayer2Advantage()) {
             if (playerId.equals(currentMatch.getIdPlayer1())) {
-                if (currentMatch.getPoints1().equals(TennisPoint.GAME)) {
+                if (currentMatch.getPoints1().equals(TennisPoint.ADVANTAGE)) {
                     currentMatch.setGames1(currentMatch.getGames1() + 1);
                     resetPoints(currentMatch);
                     checkSetWin(currentMatch);
                 }
             } else if (playerId.equals(currentMatch.getIdPlayer2())) {
-                if (currentMatch.getPoints2().equals(TennisPoint.GAME)) {
+                if (currentMatch.getPoints2().equals(TennisPoint.ADVANTAGE)) {
                     currentMatch.setGames2(currentMatch.getGames2() + 1);
                     resetPoints(currentMatch);
                     checkSetWin(currentMatch);

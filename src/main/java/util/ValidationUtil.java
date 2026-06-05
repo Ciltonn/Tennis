@@ -20,7 +20,10 @@ public final class ValidationUtil {
             throw new InvalidParameterException("Player name cannot be less 2 characters and more 30 characters");
         }
         if(!NAME_PATTERN.matcher(playerName).matches()) {
-            throw new InvalidParameterException("Use only English or Russian letters");
+            throw new InvalidParameterException("\"Use only English or Russian letters, spaces, hyphens( - ), apostrophes( ' ), and dots( . )");
+        }
+        if (!playerName.matches(".*[a-zA-Zа-яА-ЯёЁ].*")) {
+            throw new InvalidParameterException("Player name must contain at least one letter");
         }
     }
     public static void validatePlayers(PlayerRequest playerRequest1, PlayerRequest playerRequest2) {

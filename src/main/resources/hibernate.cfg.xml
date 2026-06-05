@@ -12,8 +12,9 @@
         <property name="hibernate.show_sql">true</property>
         <property name="hibernate.format_sql">true</property>
         <property name="hibernate.hbm2ddl.auto">create-drop</property>
+        <property name="hibernate.current_session_context_class">thread</property>
         <property name="hibernate.connection.pool_size">5</property>
         <mapping class="entity.Player"/>
-        <mapping class="entity.Match"/>
+        <mapping class="entity.TennisMatch"/>
     </session-factory>
 </hibernate-configuration>
