@@ -1,7 +1,6 @@
 package servlets;
 
 import model.CurrentMatch;
-import dto.PlayerRequest;
 import exception.InvalidParameterException;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;

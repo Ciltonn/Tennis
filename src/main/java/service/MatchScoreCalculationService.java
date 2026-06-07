@@ -1,8 +1,7 @@
 package service;
 
 import model.CurrentMatch;
-import model.MatchState;
-import model.TennisPoint;
+import model.Point;
 
 import java.util.UUID;
 
@@ -41,15 +40,15 @@ public class MatchScoreCalculationService {
 
     private void countingGame(CurrentMatch currentMatch, Long playerId) {
         if (playerId.equals(currentMatch.getIdPlayer1())) {
-            TennisPoint tennisPoint = currentMatch.getPoints1();
-            if(!(currentMatch.getPoints1()==TennisPoint.FORTY &&
-            currentMatch.getPoints2()==TennisPoint.FORTY)) {
+            Point tennisPoint = currentMatch.getPoints1();
+            if(!(currentMatch.getPoints1()== Point.FORTY &&
+            currentMatch.getPoints2()== Point.FORTY)) {
             currentMatch.setPoints1(tennisPoint.next());
             }
         } else {
-            TennisPoint tennisPoint = currentMatch.getPoints2();
-            if(!(currentMatch.getPoints2()==TennisPoint.FORTY &&
-                    currentMatch.getPoints1()==TennisPoint.FORTY)) {
+            Point tennisPoint = currentMatch.getPoints2();
+            if(!(currentMatch.getPoints2()== Point.FORTY &&
+                    currentMatch.getPoints1()== Point.FORTY)) {
                 currentMatch.setPoints2(tennisPoint.next());
             }
 
@@ -62,13 +61,13 @@ public class MatchScoreCalculationService {
         MatchState state = currentMatch.getMatchState();
         if (!state.isDeuce() && !state.isPlayer1Advantage() && !state.isPlayer2Advantage()) {
             if (playerId.equals(currentMatch.getIdPlayer1())) {
-                if (currentMatch.getPoints1().equals(TennisPoint.ADVANTAGE)) {
+                if (currentMatch.getPoints1().equals(Point.ADVANTAGE)) {
                     currentMatch.setGames1(currentMatch.getGames1() + 1);
                     resetPoints(currentMatch);
                     checkSetWin(currentMatch);
                 }
             } else if (playerId.equals(currentMatch.getIdPlayer2())) {
-                if (currentMatch.getPoints2().equals(TennisPoint.ADVANTAGE)) {
+                if (currentMatch.getPoints2().equals(Point.ADVANTAGE)) {
                     currentMatch.setGames2(currentMatch.getGames2() + 1);
                     resetPoints(currentMatch);
                     checkSetWin(currentMatch);
@@ -93,8 +92,8 @@ public class MatchScoreCalculationService {
             state.setPlayer1Advantage(false);
             state.setPlayer2Advantage(false);
             state.setDeuce(true);
-            currentMatch.setPoints2(TennisPoint.FORTY);
-            currentMatch.setPoints1(TennisPoint.FORTY);
+            currentMatch.setPoints2(Point.FORTY);
+            currentMatch.setPoints1(Point.FORTY);
         }
         currentMatch.setMatchState(state);
     }
@@ -103,11 +102,11 @@ public class MatchScoreCalculationService {
         MatchState state = currentMatch.getMatchState();
         if (!state.isPlayer1Advantage() && !state.isPlayer2Advantage()) {
             if (playerId.equals(currentMatch.getIdPlayer1())) {
-                currentMatch.setPoints1(TennisPoint.ADVANTAGE);
+                currentMatch.setPoints1(Point.ADVANTAGE);
                 state.setPlayer1Advantage(true);
                 state.setDeuce(false);
             } else {
-                currentMatch.setPoints2(TennisPoint.ADVANTAGE);
+                currentMatch.setPoints2(Point.ADVANTAGE);
                 state.setPlayer2Advantage(true);
                 state.setDeuce(false);
             }
@@ -116,8 +115,8 @@ public class MatchScoreCalculationService {
     }
 
     private void checkDeuce(CurrentMatch currentMatch) {
-        if (currentMatch.getPoints1() == TennisPoint.FORTY &&
-                currentMatch.getPoints2() == TennisPoint.FORTY) {
+        if (currentMatch.getPoints1() == Point.FORTY &&
+                currentMatch.getPoints2() == Point.FORTY) {
             MatchState state = currentMatch.getMatchState();
             state.setDeuce(true);
             currentMatch.setMatchState(state);
@@ -191,8 +190,8 @@ public class MatchScoreCalculationService {
     private void resetGamesAndPoints(CurrentMatch currentMatch) {
         currentMatch.setGames1(0);
         currentMatch.setGames2(0);
-        currentMatch.setPoints1(TennisPoint.ZERO);
-        currentMatch.setPoints2(TennisPoint.ZERO);
+        currentMatch.setPoints1(Point.ZERO);
+        currentMatch.setPoints2(Point.ZERO);
     }
 
     private void resetGames(CurrentMatch currentMatch) {
@@ -201,8 +200,8 @@ public class MatchScoreCalculationService {
     }
 
     private void resetPoints(CurrentMatch currentMatch) {
-        currentMatch.setPoints1(TennisPoint.ZERO);
-        currentMatch.setPoints2(TennisPoint.ZERO);
+        currentMatch.setPoints1(Point.ZERO);
+        currentMatch.setPoints2(Point.ZERO);
     }
 }
 
