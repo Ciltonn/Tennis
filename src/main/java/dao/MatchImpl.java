@@ -13,7 +13,13 @@ import java.util.Optional;
 
 @Slf4j
 public class MatchImpl implements MatchDao {
-    private static final
+    private static final String FIND_ALL_MATCHES_WITH_PLAYERS = """
+                            SELECT DISTINCT m FROM TennisMatch m
+                            LEFT JOIN FETCH m.firstPlayer
+                            LEFT JOIN FETCH m.secondPlayer
+                            LEFT JOIN FETCH m.winner
+                            ORDER BY m.id DESC
+""";
     @Override
     public Optional<TennisMatch> findById(Long id) {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
@@ -47,11 +53,7 @@ public class MatchImpl implements MatchDao {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             int offset = (page - 1) * pageSize;
             Query<TennisMatch> query = session.createQuery(
-                    "SELECT DISTINCT m FROM TennisMatch m " +
-                            "LEFT JOIN FETCH m.firstPlayer " +
-                            "LEFT JOIN FETCH m.secondPlayer " +
-                            "LEFT JOIN FETCH m.winner " +
-                            "ORDER BY m.id DESC",
+                    FIND_ALL_MATCHES_WITH_PLAYERS,
                     TennisMatch.class);
             query.setFirstResult(offset);
             query.setMaxResults(pageSize);
