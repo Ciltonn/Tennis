@@ -41,16 +41,20 @@ public class PlayerImpl implements PlayerDao {
     }
 
     @Override
-    public Player save(Player player) {
-        Session session = HibernateUtil.getSessionFactory().getCurrentSession();
-        try {
-            session.persist(player);
-            return player;
-        } catch (HibernateException e) {
-            log.error("Error saving player: {}", player.getName(), e);
-            throw new DatabaseOperationException("Failed to save player in database");
-        }
+    public Player creatorOrSave(Player player) {
+        Optional<Player> existingPlayer = findByName(player.getName());
+        return existingPlayer.orElseGet(() -> {
+            Session session = HibernateUtil.getSessionFactory().getCurrentSession();
+            try {
+                session.persist(player);
+                return player;
+            } catch (HibernateException e) {
+                log.error("Error saving player: {}", player.getName(), e);
+                throw new DatabaseOperationException("Failed to save player in database");
+            }
+        });
     }
+
     @Override
     public List<Player> findAll(int offset, int limit) {
         Session session = HibernateUtil.getSessionFactory().getCurrentSession();
@@ -64,6 +68,7 @@ public class PlayerImpl implements PlayerDao {
             throw new DatabaseOperationException("Failed to retrieve players from database");
         }
     }
+
     @Override
     public long count() {
         Session session = HibernateUtil.getSessionFactory().getCurrentSession();

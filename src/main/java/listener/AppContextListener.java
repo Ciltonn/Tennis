@@ -21,8 +21,6 @@ public class AppContextListener implements ServletContextListener {
         OngoingMatchService ongoingMatchService = new OngoingMatchService();
         CurrentMatch currentMatch = new CurrentMatch();
         FinishedMatchesPersistenceService finishedMatchesPersistenceService = new FinishedMatchesPersistenceService(ongoingMatchService, player, match);
-        MatchScoreCalculationService matchScoreCalculationService = new MatchScoreCalculationService(ongoingMatchService);
-        MatchesService matchesService = new MatchesService(match, player);
         PlayerService playerService = new PlayerService(player);
         ServletContext context = servletContextEvent.getServletContext();
         context.setAttribute("match", match);
@@ -30,9 +28,7 @@ public class AppContextListener implements ServletContextListener {
         context.setAttribute("newMatchService", newMatchService);
         context.setAttribute("ongoingMatchService", ongoingMatchService);
         context.setAttribute("currentMatch", currentMatch);
-        context.setAttribute("matchScoreCalculationService", matchScoreCalculationService);
         context.setAttribute("finishedMatchesPersistenceService", finishedMatchesPersistenceService);
-        context.setAttribute("matchesService", matchesService);
         context.setAttribute("playerService", playerService);
     }
 }

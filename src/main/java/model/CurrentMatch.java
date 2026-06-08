@@ -68,6 +68,9 @@ public class CurrentMatch {
             }
         }
     }
+    public boolean isMatchFinished() {
+        return isFinished;
+    }
 }
 
 
