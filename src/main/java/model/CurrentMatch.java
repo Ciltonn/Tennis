@@ -14,14 +14,14 @@ import java.util.UUID;
 public class CurrentMatch {
     private static final int SETS_TO_WIN = 2;
     private UUID matchId;
-    private Player firstPlayer;
-    private Player secondPlayer;
+    private String firstPlayer;
+    private String secondPlayer;
     private List<Set> sets;
     private Game currentGame;
     private boolean isFinished;
-    private Player winner;
+    private String winner;
 
-    public CurrentMatch(Player firstPlayer, Player secondPlayer) {
+    public CurrentMatch(String firstPlayer, String secondPlayer) {
         this.matchId = UUID.randomUUID();
         this.firstPlayer = firstPlayer;
         this.secondPlayer = secondPlayer;

@@ -4,18 +4,37 @@ public class Set {
     private int firstPlayerGames;
     private int secondPlayersGames;
     private boolean isTieBreak;
+    private TieBreakScore tieBreakScore;
 
-    public Set() {
-        this.firstPlayerGames = 0;
-        this.secondPlayersGames = 0;
+    public Set(int firstPlayerGames, int secondPlayersGames) {
+        this.firstPlayerGames = firstPlayerGames;
+        this.secondPlayersGames = secondPlayersGames;
         this.isTieBreak = false;
+        this.tieBreakScore = null;
     }
 
-    public void addGame(int player) {
+    public boolean addGame(int player) {
+        if (isTieBreak) {
+            boolean finished = tieBreakScore.addPoint(player);
+            if (finished) {
+                if (tieBreakScore.getWinner() == 1) {
+                    firstPlayerGames++;
+                } else {
+                    secondPlayersGames++;
+                }
+                isTieBreak = false;
+                tieBreakScore = null;
+                return true;
+            }
+            return false;
+        }
         if (player == 1) {
             firstPlayerGames++;
-        } else secondPlayersGames++;
+        } else {
+            secondPlayersGames++;
+        }
         updateTieBreak();
+        return isSetFinished();
     }
 
     public boolean isSetFinished() {
@@ -30,7 +49,8 @@ public class Set {
         }
         return false;
     }
-     public int getWinnerSet() {
+
+    public int getWinnerSet() {
         if (!isSetFinished()) {
             return 0;
         }
@@ -38,9 +58,11 @@ public class Set {
             return 1;
         } else return 2;
     }
+
     private void updateTieBreak() {
-        if (firstPlayerGames == 6 && secondPlayersGames == 6) {
+        if (firstPlayerGames == 6 && secondPlayersGames == 6 && !isTieBreak) {
             isTieBreak = true;
+            tieBreakScore = new TieBreakScore();
         }
     }
 

@@ -41,15 +41,16 @@ public class PlayerImpl implements PlayerDao {
     }
 
     @Override
-    public Player creatorOrSave(Player player) {
-        Optional<Player> existingPlayer = findByName(player.getName());
+    public Player creatorOrSave(String playerName) {
+        Optional<Player> existingPlayer = findByName(playerName);
         return existingPlayer.orElseGet(() -> {
             Session session = HibernateUtil.getSessionFactory().getCurrentSession();
+            Player newPlayer = new Player(playerName);
             try {
-                session.persist(player);
-                return player;
+                session.persist(newPlayer);
+                return newPlayer;
             } catch (HibernateException e) {
-                log.error("Error saving player: {}", player.getName(), e);
+                log.error("Error saving player: {}", playerName, e);
                 throw new DatabaseOperationException("Failed to save player in database");
             }
         });

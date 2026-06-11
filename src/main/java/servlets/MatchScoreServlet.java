@@ -1,8 +1,6 @@
 package servlets;
 
-import dao.PlayerImpl;
 import model.CurrentMatch;
-import entity.Player;
 import exception.NotFoundException;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
@@ -12,7 +10,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import service.FinishedMatchesPersistenceService;
 import service.OngoingMatchService;
-import service.PlayerService;
 
 import java.io.IOException;
 import java.util.UUID;
@@ -20,9 +17,6 @@ import java.util.UUID;
 @WebServlet("/match-score")
 public class MatchScoreServlet extends HttpServlet {
     private OngoingMatchService ongoingMatchService;
-    private PlayerImpl playerImpl;
-    private MatchScoreCalculationService matchScoreCalculationService;
-    private PlayerService playerService;
     private FinishedMatchesPersistenceService finishedMatchesPersistenceService;
 
     @Override
@@ -30,70 +24,48 @@ public class MatchScoreServlet extends HttpServlet {
         super.init();
         ServletContext context = getServletContext();
         this.ongoingMatchService = (OngoingMatchService) context.getAttribute("ongoingMatchService");
-        this.playerImpl = (PlayerImpl) context.getAttribute("player");
-        this.matchScoreCalculationService = (MatchScoreCalculationService) context.getAttribute("matchScoreCalculationService");
-        this.playerService = (PlayerService) context.getAttribute("playerService");
         this.finishedMatchesPersistenceService = (FinishedMatchesPersistenceService) context.getAttribute("finishedMatchesPersistenceService");
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String matchId = request.getParameter("uuid");
-        if(matchId==null) {
+        if (matchId == null) {
             throw new NotFoundException("Match ID not found");
         }
         UUID uuid = UUID.fromString(matchId);
         CurrentMatch match = ongoingMatchService.getCurrentMatch(uuid);
         setAttribute(request, match);
         request.setAttribute("matchId", match.getMatchId());
-        request.setAttribute("isTieBreak", match.getMatchState().isTieBreak());
+        //request.setAttribute("isTieBreak", match.getMatchState().isTieBreak());
         request.getRequestDispatcher("/match-score.jsp").forward(request, response);
     }
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String playerName = request.getParameter("player");
+        int numberPlayerParam = Integer.parseInt(request.getParameter("number"));
         String matchIdString = request.getParameter("uuid");
         UUID matchId = UUID.fromString(matchIdString);
-        Long playerId = playerService.convertNamePlayerToId(playerName);
-        CurrentMatch match = matchScoreCalculationService.calculateScore(matchId, playerId);
-        boolean matchOver = match.getMatchState().isMatchOver();
-        if (matchOver) {
-            finishedMatchesPersistenceService.finishMatch(match.getMatchId());
-            String winner;
-            if (match.getSets1() > match.getSets2()) {
-                winner = playerImpl.findById(match.getIdPlayer1()).orElseThrow().getName();
+        CurrentMatch match = ongoingMatchService.getCurrentMatch(matchId);
+        match.pointWon(numberPlayerParam);
+        finishedMatchesPersistenceService.finishMatch(match);
 
-            } else {
-                winner = playerImpl.findById(match.getIdPlayer2()).orElseThrow().getName();
+        request.setAttribute("winner", match.getWinner());
+        request.setAttribute("firstPlayer", match.getFirstPlayer());
+        request.setAttribute("secondPlayer", match.getSecondPlayer());
+        request.getRequestDispatcher("/match-result.jsp").forward(request, response);
 
-            }
-            String player1name = playerImpl.findById(match.getIdPlayer1()).orElseThrow().getName();
-            String player2name = playerImpl.findById(match.getIdPlayer2()).orElseThrow().getName();
-            request.setAttribute("winner", winner);
-            request.setAttribute("player1Name", player1name);
-            request.setAttribute("player2Name", player2name);
-            request.getRequestDispatcher("/match-result.jsp").forward(request, response);
-
-        } else {
-            setAttribute(request, match);
-            request.setAttribute("matchId", match.getMatchId().toString());
-            request.getRequestDispatcher("/match-score.jsp").forward(request, response);
-        }
+        setAttribute(request, match);
+        request.setAttribute("matchId", match.getMatchId());
+        request.getRequestDispatcher("/match-score.jsp").forward(request, response);
     }
-
     public void setAttribute(HttpServletRequest request, CurrentMatch match) {
-        Player player1 = playerImpl.findById(match.getIdPlayer1())
-                .orElseThrow();
-        Player player2 = playerImpl.findById(match.getIdPlayer2())
-                .orElseThrow();
-        request.setAttribute("player1Name", player1.getName());
-        request.setAttribute("player2Name", player2.getName());
-        request.setAttribute("sets1", match.getSets1());
-        request.setAttribute("sets2", match.getSets2());
-        request.setAttribute("games1", match.getGames1());
-        request.setAttribute("games2", match.getGames2());
-        request.setAttribute("points1", match.getPoints1());
-        request.setAttribute("points2", match.getPoints2());
+        request.setAttribute("player1Name", match.getFirstPlayer());
+        request.setAttribute("player2Name", match.getSecondPlayer());
+        request.setAttribute("sets", match.getSets());
+        request.setAttribute("games1", match.getCurrentGame());
     }
 }
+
+
+

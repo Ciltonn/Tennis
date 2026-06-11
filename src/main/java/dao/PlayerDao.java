@@ -9,7 +9,7 @@ public interface PlayerDao {
 
     Optional <Player> findByName(String name);
     Optional <Player> findById (Long id);
-    Player creatorOrSave (Player player);
+    Player creatorOrSave (String playerName);
     List<Player> findAll(int offset, int limit);
     long count();
 }

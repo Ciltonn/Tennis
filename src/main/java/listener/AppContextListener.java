@@ -14,21 +14,17 @@ import service.*;
 public class AppContextListener implements ServletContextListener {
 
     @Override
-    public void contextInitialized (ServletContextEvent servletContextEvent) {
+    public void contextInitialized(ServletContextEvent servletContextEvent) {
         MatchImpl match = new MatchImpl();
         PlayerImpl player = new PlayerImpl();
-        NewMatchService newMatchService = new NewMatchService(player);
+        NewMatchService newMatchService = new NewMatchService();
         OngoingMatchService ongoingMatchService = new OngoingMatchService();
-        CurrentMatch currentMatch = new CurrentMatch();
-        FinishedMatchesPersistenceService finishedMatchesPersistenceService = new FinishedMatchesPersistenceService(ongoingMatchService, player, match);
-        PlayerService playerService = new PlayerService(player);
+        FinishedMatchesPersistenceService finishedMatchesPersistenceService = new FinishedMatchesPersistenceService(player, match);
         ServletContext context = servletContextEvent.getServletContext();
         context.setAttribute("match", match);
         context.setAttribute("player", player);
         context.setAttribute("newMatchService", newMatchService);
         context.setAttribute("ongoingMatchService", ongoingMatchService);
-        context.setAttribute("currentMatch", currentMatch);
         context.setAttribute("finishedMatchesPersistenceService", finishedMatchesPersistenceService);
-        context.setAttribute("playerService", playerService);
     }
 }

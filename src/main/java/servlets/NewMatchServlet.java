@@ -1,5 +1,6 @@
 package servlets;
 
+import dto.PlayerRequestDto;
 import model.CurrentMatch;
 import exception.InvalidParameterException;
 import jakarta.servlet.ServletContext;
@@ -9,21 +10,23 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import service.NewMatchService;
+import service.OngoingMatchService;
 
 import java.io.IOException;
 import java.util.UUID;
-
-import util.ValidationUtil;
+import static util.ValidationUtil.validate;
 
 @WebServlet("/new-match")
 public class NewMatchServlet extends HttpServlet {
     private NewMatchService newMatchService;
+    private OngoingMatchService ongoingMatchService;
 
     @Override
     public void init() throws ServletException {
         super.init();
         ServletContext context = getServletContext();
         this.newMatchService = (NewMatchService) context.getAttribute("newMatchService");
+        this.ongoingMatchService = (OngoingMatchService) context.getAttribute("ongoingMatchService");
     }
 
     @Override
@@ -33,20 +36,16 @@ public class NewMatchServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        String playerOne = request.getParameter("playerOne");
-        String playerTwo = request.getParameter("playerTwo");
+        String firstPlayer = request.getParameter("firstPlayer");
+        String secondPlayer = request.getParameter("secondPlayer");
+        PlayerRequestDto playerRequest = new PlayerRequestDto(firstPlayer, secondPlayer);
+        validate(playerRequest);
         try {
-            PlayerRequest playerRequest1 = new PlayerRequest();
-            playerRequest1.setName(playerOne);
-            ValidationUtil.validate(playerRequest1);
-            PlayerRequest playerRequest2 = new PlayerRequest();
-            playerRequest2.setName(playerTwo);
-            ValidationUtil.validate(playerRequest2);
-            ValidationUtil.validatePlayers(playerRequest1, playerRequest2);
-            CurrentMatch match = newMatchService.createNewMatch(playerRequest1, playerRequest2);
-            UUID match_id = match.getMatchId();
+            CurrentMatch match = newMatchService.createNewMatch(firstPlayer, secondPlayer);
+            UUID matchId = match.getMatchId();
             String contextPath = request.getContextPath();
-            response.sendRedirect(contextPath + "/match-score?uuid=" + match_id);
+            ongoingMatchService.saveCurrentMatch(matchId, match);
+            response.sendRedirect(contextPath + "/match-score?uuid=" + matchId);
         } catch (InvalidParameterException e) {
             request.setAttribute("error", e.getMessage());
             request.getRequestDispatcher("/new-match.jsp").forward(request, response);

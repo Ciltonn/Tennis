@@ -8,6 +8,9 @@ import entity.Player;
 import exception.DatabaseOperationException;
 import exception.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
+import util.HibernateUtil;
 
 @Slf4j
 public class FinishedMatchesPersistenceService {
