@@ -4,7 +4,6 @@ import entity.TennisMatch;
 import exception.DatabaseOperationException;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
 import util.HibernateUtil;
 import org.hibernate.query.Query;
 
@@ -14,15 +13,31 @@ import java.util.Optional;
 @Slf4j
 public class MatchImpl implements MatchDao {
     private static final String FIND_ALL_MATCHES_WITH_PLAYERS = """
-                            SELECT DISTINCT m FROM TennisMatch m
-                            LEFT JOIN FETCH m.firstPlayer
-                            LEFT JOIN FETCH m.secondPlayer
-                            LEFT JOIN FETCH m.winner
-                            ORDER BY m.id DESC
-""";
+                                        SELECT DISTINCT m FROM TennisMatch m
+                                        LEFT JOIN FETCH m.firstPlayer
+                                        LEFT JOIN FETCH m.secondPlayer
+                                        LEFT JOIN FETCH m.winner
+                                        ORDER BY m.id DESC
+            """;
+
+    private static final String FIND_BY_PLAYER_HQL = """
+            SELECT DISTINCT m FROM TennisMatch m
+            LEFT JOIN FETCH m.firstPlayer
+            LEFT JOIN FETCH m.secondPlayer
+            LEFT JOIN FETCH m.winner
+            WHERE m.firstPlayer.id = :playerId OR m.secondPlayer.id = :playerId
+            ORDER BY m.id DESC """;
+
+    private static final String COUNT_ALL_HQL = "SELECT COUNT(m) FROM TennisMatch m";
+
+    private static final String COUNT_BY_PLAYER_HQL = """
+            SELECT COUNT(m) FROM TennisMatch m
+            WHERE m.firstPlayer.id = :playerId OR m.secondPlayer.id = :playerId""";
+
     @Override
     public Optional<TennisMatch> findById(Long id) {
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+        Session session = HibernateUtil.getSessionFactory().getCurrentSession();
+        try {
             TennisMatch findingMatch = session.get(TennisMatch.class, id);
             return Optional.ofNullable(findingMatch);
         } catch (Exception e) {
@@ -33,50 +48,39 @@ public class MatchImpl implements MatchDao {
 
     @Override
     public TennisMatch save(TennisMatch match) {
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            Transaction transaction = session.beginTransaction();
-            try {
-                session.persist(match);
-                transaction.commit();
-                return match;
-            } catch (Exception e) {
-                log.error("Error saving match: {}", match.getId(), e);
-                if (transaction != null) {
-                    transaction.rollback();
-                }
-                throw new DatabaseOperationException("Failed to save match");
-            }
+        Session session = HibernateUtil.getSessionFactory().getCurrentSession();
+        try {
+            session.persist(match);
+            return match;
+        } catch (Exception e) {
+            log.error("Error saving match: {}", match.getId(), e);
+            throw new DatabaseOperationException("Failed to save match");
         }
     }
 
-      public List<TennisMatch> findAllWithPagination(int page, int pageSize) {
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            int offset = (page - 1) * pageSize;
+
+    public List<TennisMatch> findAllWithPagination(int offset, int limit) {
+        Session session = HibernateUtil.getSessionFactory().getCurrentSession();
+        try {
             Query<TennisMatch> query = session.createQuery(
                     FIND_ALL_MATCHES_WITH_PLAYERS,
                     TennisMatch.class);
-            query.setFirstResult(offset);
-            query.setMaxResults(pageSize);
+            query.setFirstResult(offset)
+            .setMaxResults(limit);
             return query.list();
         } catch (Exception e) {
             throw new DatabaseOperationException("Failed to retrieve matches with pagination");
         }
     }
 
-    public List<TennisMatch> findAllByPlayerNameWithPagination(Long playerId, int page, int pageSize) {
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            int offset = (page - 1) * pageSize;
+    public List<TennisMatch> findAllByPlayerNameWithPagination(Long playerId, int offset, int limit) {
+        Session session = HibernateUtil.getSessionFactory().getCurrentSession();
+        try {
             Query<TennisMatch> query = session.createQuery(
-                    "SELECT DISTINCT m FROM TennisMatch m " +
-                            "LEFT JOIN FETCH m.firstPlayer " +
-                            "LEFT JOIN FETCH m.secondPlayer " +
-                            "LEFT JOIN FETCH m.winner " +
-                            "WHERE m.firstPlayer.id = :playerId OR m.secondPlayer.id = :playerId " +
-                            "ORDER BY m.id DESC",
-                    TennisMatch.class);
+                    FIND_BY_PLAYER_HQL, TennisMatch.class);
             query.setParameter("playerId", playerId);
-            query.setFirstResult(offset);
-            query.setMaxResults(pageSize);
+            query.setFirstResult(offset)
+            .setMaxResults(limit);
             return query.list();
         } catch (Exception e) {
             throw new DatabaseOperationException("Failed to retrieve matches for player with pagination");
@@ -84,8 +88,9 @@ public class MatchImpl implements MatchDao {
     }
 
     public Long countMatchForPagination() {
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            Query<Long> query = session.createQuery("SELECT COUNT (m) FROM TennisMatch m", Long.class);
+        Session session = HibernateUtil.getSessionFactory().getCurrentSession();
+        try {
+            Query<Long> query = session.createQuery(COUNT_ALL_HQL, Long.class);
             return query.uniqueResult();
         } catch (Exception e) {
             throw new DatabaseOperationException("Failed to count matches");
@@ -93,9 +98,10 @@ public class MatchImpl implements MatchDao {
     }
 
     public Long countMatchesForPlayerForPagination(Long playerId) {
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+        Session session = HibernateUtil.getSessionFactory().getCurrentSession();
+        try {
             Query<Long> query = session.createQuery(
-                    "SELECT COUNT (m) FROM TennisMatch m WHERE m.firstPlayer.id = :playerId OR m.secondPlayer.id = :playerId", Long.class);
+                    COUNT_BY_PLAYER_HQL, Long.class);
             query.setParameter("playerId", playerId);
             return query.uniqueResult();
         } catch (Exception e) {
@@ -103,3 +109,4 @@ public class MatchImpl implements MatchDao {
         }
     }
 }
+

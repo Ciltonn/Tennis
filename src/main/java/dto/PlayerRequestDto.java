@@ -1,27 +1,13 @@
 package dto;
 
-public class PlayerRequestDto {
-    private String firstPlayer;
-    private String secondPlayer;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
-    public PlayerRequestDto(String firstPlayer, String secondPlayer) {
-        this.firstPlayer = firstPlayer;
-        this.secondPlayer = secondPlayer;
-    }
-
-    public String getFirstPlayer() {
-        return firstPlayer;
-    }
-
-    public String getSecondPlayer() {
-        return secondPlayer;
-    }
-
-    public void setFirstPlayer(String firstPlayer) {
-        this.firstPlayer = firstPlayer;
-    }
-
-    public void setSecondPlayer(String secondPlayer) {
-        this.secondPlayer = secondPlayer;
-    }
-}
+public record PlayerRequestDto(
+        @NotBlank(message = "Player name cannot be blank.")
+        @Size(min = 2, max = 30, message = "Player name must be between {min} and {max} characters.")
+    String firstPlayer,
+    @NotBlank(message = "Player name cannot be blank.")
+    @Size(min = 2, max = 30, message = "Player name must be between {min} and {max} characters.")
+    String secondPlayer
+) {}

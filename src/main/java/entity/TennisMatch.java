@@ -6,7 +6,7 @@ import lombok.*;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-@Table (name = "matches", check = @CheckConstraint(name="match_players_and_winner_chek",
+@Table (name = "tennis_matches", check = @CheckConstraint(name="match_players_and_winner_chek",
         constraint = "first_player_id <> second_player_id AND (winner_id = first_player_id OR winner_id = second_player_id)"))
 
 public class TennisMatch {

@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Slf4j
-public class PlayerImpl implements PlayerDao {
+public class PlayerDaoImpl implements PlayerDao {
     private static final String FIND_BY_NAME_HQL = """
             FROM Player p WHERE p.name = :name""";
 
@@ -24,7 +24,7 @@ public class PlayerImpl implements PlayerDao {
                     .uniqueResultOptional();
         } catch (HibernateException e) {
             log.error("Error finding player by name: {}", name, e);
-            throw new DatabaseOperationException("Failed to retrieve player from database");
+            throw new DatabaseOperationException("Failed to retrieve player by name from database", e);
         }
     }
 
@@ -36,7 +36,7 @@ public class PlayerImpl implements PlayerDao {
             return Optional.ofNullable(player);
         } catch (HibernateException e) {
             log.error("Error finding player by ID: {}", id, e);
-            throw new DatabaseOperationException("Failed to retrieve player from database");
+            throw new DatabaseOperationException("Failed to retrieve player by id from database", e);
         }
     }
 
@@ -51,7 +51,7 @@ public class PlayerImpl implements PlayerDao {
                 return newPlayer;
             } catch (HibernateException e) {
                 log.error("Error saving player: {}", playerName, e);
-                throw new DatabaseOperationException("Failed to save player in database");
+                throw new DatabaseOperationException("Failed to save player in database", e);
             }
         });
     }
@@ -66,7 +66,7 @@ public class PlayerImpl implements PlayerDao {
                     .list();
         } catch (HibernateException e) {
             log.error("Database error while finding all players", e);
-            throw new DatabaseOperationException("Failed to retrieve players from database");
+            throw new DatabaseOperationException("Failed to retrieve players from database", e);
         }
     }
 
@@ -78,7 +78,7 @@ public class PlayerImpl implements PlayerDao {
                     .uniqueResult();
         } catch (HibernateException e) {
             log.error("Database error while counting players", e);
-            throw new DatabaseOperationException("Failed to count players in database");
+            throw new DatabaseOperationException("Failed to count players in database", e);
         }
     }
 }

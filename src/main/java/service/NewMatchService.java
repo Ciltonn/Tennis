@@ -1,9 +1,6 @@
 package service;
 
 import model.CurrentMatch;
-import entity.Player;
-import static util.ValidationUtil.validate;
-
 
 public class NewMatchService {
 

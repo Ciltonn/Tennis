@@ -49,30 +49,30 @@
                 </thead>
                 <tbody>
                 <tr class="player1">
-                    <td class="table-text">${player1Name}</td>
-                    <td class="table-text">${sets1}</td>
-                    <td class="table-text">${games1}</td>
-                    <td class="table-text">${points1}</td>
+                    <td class="table-text">${match.firstPlayer}</td>
+                    <td class="table-text">${match.setWon(1)}</td>
+                    <td class="table-text">${match.currentGame(1)}</td>
+                    <td class="table-text">${match.currentGame(1)}</td>
                     <td class="table-text">
                         <div class="action-container">
                         <form action="${pageContext.request.contextPath}/match-score" method="post" class="point-form">
-                        <input type="hidden" name="uuid" value="${matchId}">
-                        <input type="hidden" name="player" value="${player1Name}">
+                        <input type="hidden" name="uuid" value="${match.matchId}">
+                        <input type="hidden" name="number" value="1">
                         <button type="submit" class="score-btn">Score</button>
                         </form>
     </div>
                     </td>
                 </tr>
                 <tr class="player2">
-                    <td class="table-text">${player2Name}</td>
-                    <td class="table-text">${sets2}</td>
-                    <td class="table-text">${games2}</td>
-                    <td class="table-text">${points2}</td>
+                    <td class="table-text">${match.secondPlayer}</td>
+                    <td class="table-text">${match.setWon(2)}</td>
+                    <td class="table-text">${match.currentGame(2)}</td>
+                    <td class="table-text">${match.currentGame(2)}</td>
                     <td class="table-text">
                         <div class="action-container">
                          <form action="${pageContext.request.contextPath}/match-score" method="post" class="point-form">
-                         <input type="hidden" name="uuid" value="${matchId}">
-                         <input type="hidden" name="player" value="${player2Name}">
+                         <input type="hidden" name="uuid" value="${match.matchId}">
+                         <input type="hidden" name="number" value="2">
                          <button type="submit" class="score-btn">Score</button>
                           </form>
                             </div>

@@ -13,7 +13,7 @@ public class Set {
         this.tieBreakScore = null;
     }
 
-    public boolean addGame(int player) {
+        public boolean addGame(int player) {
         if (isTieBreak) {
             boolean finished = tieBreakScore.addPoint(player);
             if (finished) {

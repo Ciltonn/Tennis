@@ -35,9 +35,7 @@ public class MatchScoreServlet extends HttpServlet {
         }
         UUID uuid = UUID.fromString(matchId);
         CurrentMatch match = ongoingMatchService.getCurrentMatch(uuid);
-        setAttribute(request, match);
-        request.setAttribute("matchId", match.getMatchId());
-        //request.setAttribute("isTieBreak", match.getMatchState().isTieBreak());
+        setMatchAttributes(request, match);
         request.getRequestDispatcher("/match-score.jsp").forward(request, response);
     }
 
@@ -48,23 +46,17 @@ public class MatchScoreServlet extends HttpServlet {
         UUID matchId = UUID.fromString(matchIdString);
         CurrentMatch match = ongoingMatchService.getCurrentMatch(matchId);
         match.pointWon(numberPlayerParam);
-        finishedMatchesPersistenceService.finishMatch(match);
-
-        request.setAttribute("winner", match.getWinner());
-        request.setAttribute("firstPlayer", match.getFirstPlayer());
-        request.setAttribute("secondPlayer", match.getSecondPlayer());
-        request.getRequestDispatcher("/match-result.jsp").forward(request, response);
-
-        setAttribute(request, match);
-        request.setAttribute("matchId", match.getMatchId());
-        request.getRequestDispatcher("/match-score.jsp").forward(request, response);
+        if (match.isFinished()) {
+            finishedMatchesPersistenceService.finishMatch(match);
+            response.sendRedirect(request.getContextPath() + "/match-result?uuid=" + matchId);
+        } else {
+            response.sendRedirect(request.getContextPath() + "/match-score?uuid=" + matchId);
+        }
     }
-    public void setAttribute(HttpServletRequest request, CurrentMatch match) {
-        request.setAttribute("player1Name", match.getFirstPlayer());
-        request.setAttribute("player2Name", match.getSecondPlayer());
-        request.setAttribute("sets", match.getSets());
-        request.setAttribute("games1", match.getCurrentGame());
-    }
+
+    private void setMatchAttributes(HttpServletRequest request, CurrentMatch match) {
+        request.setAttribute("match", match);
+           }
 }
 
 

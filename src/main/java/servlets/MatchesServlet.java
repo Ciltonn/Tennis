@@ -1,14 +1,14 @@
 package servlets;
 
 import dao.MatchImpl;
-import dao.PlayerImpl;
+import dao.PlayerDaoImpl;
 import entity.TennisMatch;
-import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import service.MatchService;
 
 import java.io.IOException;
 import java.util.List;
@@ -18,15 +18,15 @@ import java.util.Optional;
 @WebServlet("/matches")
 public class MatchesServlet extends HttpServlet {
     private static final int PAGE_SIZE = 5;
-    private MatchesService matchesService;
+    private MatchService matchService;
 
     @Override
     public void init() throws ServletException {
         super.init();
-        ServletContext context = getServletContext();
-        MatchImpl match = (MatchImpl) context.getAttribute("match");
-        PlayerImpl player = (PlayerImpl) context.getAttribute("player");
-        this.matchesService = new MatchesService(match, player);
+        // Инициализируем сервис
+        MatchImpl matchDao = new MatchImpl();
+        PlayerDaoImpl playerDao = new PlayerDaoImpl();
+        this.matchService = new MatchService(matchDao, playerDao);
     }
 
     @Override
@@ -34,10 +34,12 @@ public class MatchesServlet extends HttpServlet {
         int page = Optional.ofNullable(request.getParameter("page")).map(Integer::parseInt).orElse(1) ;
         String filterByPlayerName = request.getParameter("filter_by_player_name");
 
-        List<TennisMatch> matches = matchesService.getMatches(filterByPlayerName,page, PAGE_SIZE);
-        Long totalMatches = matchesService.getTotalMatchesCount();
-        int totalPages =1;
-        totalPages = (int) Math.ceil((double) totalMatches/PAGE_SIZE);
+        List<TennisMatch> matches = matchService.getMatches(filterByPlayerName,page, PAGE_SIZE);
+        long totalMatches = matchService.getTotalMatchesCount(filterByPlayerName);
+        int totalPages = (int) Math.ceil((double) totalMatches/PAGE_SIZE);
+        if (totalPages<1) {
+            totalPages=1;
+        }
         request.setAttribute("matches", matches);
         request.setAttribute("page", page);
         request.setAttribute("totalPages", totalPages);

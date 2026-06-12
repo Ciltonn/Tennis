@@ -1,8 +1,7 @@
 package model;
 
-import entity.Player;
-import lombok.*;
 
+import lombok.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -31,12 +30,12 @@ public class CurrentMatch {
         this.winner = null;
     }
 
-    public void pointWon(int playerNumber) {
+    public void awardPointTo(int playerNumber) {
         if (isFinished) {
             return;
         }
         if (sets.isEmpty()) {
-            sets.add(new Set());
+            sets.add(new Set(0,0));
         }
         currentGame.addPoint(playerNumber);
         if (currentGame.isGameFinished()) {
@@ -63,7 +62,7 @@ public class CurrentMatch {
                     isFinished = true;
                     winner = secondPlayer;
                 } else {
-                    sets.add(new Set());
+                    sets.add(new Set(0,0));
                 }
             }
         }

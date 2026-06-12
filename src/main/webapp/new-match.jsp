@@ -50,12 +50,13 @@
 
                 <form method="post" action="new-match">
                     <p style="color: red;">${error}</p>
-                    <label class="label-player" for="playerOne">Player one</label>
-                    <input class="input-player" id="playerOne" name="playerOne" placeholder="name" type="text" required title="Enter a name">
+                    <label class="label-player" for="firstPlayer">Player one</label>
+                    <input class="input-player"
+                           id="firstPlayer" name="firstPlayer" placeholder="name" type="text" required title="Enter a name">
 
-                    <label class="label-player" for="playerTwo">Player two</label>
+                    <label class="label-player" for="secondPlayer">Player two</label>
                     <input class="input-player" placeholder="name" type="text"
-                           id="playerTwo" name="playerTwo" required title="Enter a name">
+                           id="secondPlayer" name="secondPlayer" required title="Enter a name">
                     <input class="form-button" type="submit" value="Start">
                 </form>
             </div>
