@@ -1,6 +1,6 @@
 package service;
 
-import dao.MatchImpl;
+import dao.MatchDaoImpl;
 import dao.PlayerDaoImpl;
 import model.CurrentMatch;
 import entity.TennisMatch;
@@ -15,9 +15,9 @@ import util.HibernateUtil;
 @Slf4j
 public class FinishedMatchesPersistenceService {
     private final PlayerDaoImpl playerDaoImpl;
-    private final MatchImpl matchDaoImpl;
+    private final MatchDaoImpl matchDaoImpl;
 
-    public FinishedMatchesPersistenceService(PlayerDaoImpl playerDaoImpl, MatchImpl matchDaoImpl) {
+    public FinishedMatchesPersistenceService(PlayerDaoImpl playerDaoImpl, MatchDaoImpl matchDaoImpl) {
         this.playerDaoImpl = playerDaoImpl;
         this.matchDaoImpl = matchDaoImpl;
     }

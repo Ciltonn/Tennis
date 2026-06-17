@@ -13,7 +13,7 @@ import util.HibernateUtil;
 import java.io.IOException;
 @Slf4j
 
-@WebFilter
+@WebFilter("/*")
 public class TransactionFilter extends HttpFilter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)

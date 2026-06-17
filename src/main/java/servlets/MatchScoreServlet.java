@@ -45,18 +45,23 @@ public class MatchScoreServlet extends HttpServlet {
         String matchIdString = request.getParameter("uuid");
         UUID matchId = UUID.fromString(matchIdString);
         CurrentMatch match = ongoingMatchService.getCurrentMatch(matchId);
-        match.pointWon(numberPlayerParam);
+        match.awardPointTo(numberPlayerParam);
         if (match.isFinished()) {
             finishedMatchesPersistenceService.finishMatch(match);
-            response.sendRedirect(request.getContextPath() + "/match-result?uuid=" + matchId);
+            setMatchAttributes(request, match);
+            request.getRequestDispatcher("/match-result.jsp").forward(request, response);
+
         } else {
             response.sendRedirect(request.getContextPath() + "/match-score?uuid=" + matchId);
         }
+
     }
 
     private void setMatchAttributes(HttpServletRequest request, CurrentMatch match) {
         request.setAttribute("match", match);
            }
+
+
 }
 
 

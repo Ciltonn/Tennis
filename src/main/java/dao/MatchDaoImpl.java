@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Slf4j
-public class MatchImpl implements MatchDao {
+public class MatchDaoImpl implements MatchDao {
     private static final String FIND_ALL_MATCHES_WITH_PLAYERS = """
                                         SELECT DISTINCT m FROM TennisMatch m
                                         LEFT JOIN FETCH m.firstPlayer

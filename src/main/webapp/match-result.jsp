@@ -48,9 +48,9 @@
                 </thead>
                 <tbody>
                 <tr>
-                    <td class="table-text">${player1Name}</td>
-                    <td class="table-text">${player2Name}</td>
-                    <td class="table-text">${winner}</td>
+                    <td class="table-text">${match.firstPlayer}</td>
+                    <td class="table-text">${match.secondPlayer}</td>
+                    <td class="table-text">${match.winner}</td>
                     </tr>
                 </tbody>
             </table>

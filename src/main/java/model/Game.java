@@ -39,4 +39,14 @@ public class Game {
             return 1;
         } else return 2;
     }
+    public String getPointDisplay(int player) {
+        Point point = (player == 1) ? firstPlayerPoints : secondPlayerPoints;
+
+        // При 40:40 показываем "40" для обоих
+        if (firstPlayerPoints == Point.FORTY && secondPlayerPoints == Point.FORTY) {
+            return "40";
+        }
+
+        return point.getValue();
+    }
 }

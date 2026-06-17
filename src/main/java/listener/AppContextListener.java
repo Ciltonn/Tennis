@@ -1,6 +1,6 @@
 package listener;
 
-import dao.MatchImpl;
+import dao.MatchDaoImpl;
 import dao.PlayerDaoImpl;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletContextEvent;
@@ -14,7 +14,7 @@ public class AppContextListener implements ServletContextListener {
 
     @Override
     public void contextInitialized(ServletContextEvent servletContextEvent) {
-        MatchImpl match = new MatchImpl();
+        MatchDaoImpl match = new MatchDaoImpl();
         PlayerDaoImpl player = new PlayerDaoImpl();
         NewMatchService newMatchService = new NewMatchService();
         OngoingMatchService ongoingMatchService = new OngoingMatchService();

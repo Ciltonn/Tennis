@@ -1,6 +1,6 @@
 package servlets;
 
-import dao.MatchImpl;
+import dao.MatchDaoImpl;
 import dao.PlayerDaoImpl;
 import entity.TennisMatch;
 import jakarta.servlet.ServletException;
@@ -23,8 +23,7 @@ public class MatchesServlet extends HttpServlet {
     @Override
     public void init() throws ServletException {
         super.init();
-        // Инициализируем сервис
-        MatchImpl matchDao = new MatchImpl();
+        MatchDaoImpl matchDao = new MatchDaoImpl();
         PlayerDaoImpl playerDao = new PlayerDaoImpl();
         this.matchService = new MatchService(matchDao, playerDao);
     }

@@ -70,6 +70,45 @@ public class CurrentMatch {
     public boolean isMatchFinished() {
         return isFinished;
     }
+
+
+    public int getSetsWonByFirstPlayer() {
+        int count = 0;
+        for (Set set : sets) {
+            if (set.isSetFinished() && set.getWinnerSet() == 1) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    public int getSetsWonBySecondPlayer() {
+        int count = 0;
+        for (Set set : sets) {
+            if (set.isSetFinished() && set.getWinnerSet() == 2) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    public int getCurrentGamesFirstPlayer() {
+        if (sets.isEmpty()) return 0;
+        return sets.get(sets.size() - 1).getFirstPlayerGames();
+    }
+
+    public int getCurrentGamesSecondPlayer() {
+        if (sets.isEmpty()) return 0;
+        return sets.get(sets.size() - 1).getSecondPlayersGames();
+    }
+
+    public String getCurrentPointsFirstPlayer() {
+        return currentGame.getPointDisplay(1);
+    }
+
+    public String getCurrentPointsSecondPlayer() {
+        return currentGame.getPointDisplay(2);
+    }
 }
 
 

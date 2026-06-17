@@ -50,9 +50,9 @@
                 <tbody>
                 <tr class="player1">
                     <td class="table-text">${match.firstPlayer}</td>
-                    <td class="table-text">${match.setWon(1)}</td>
-                    <td class="table-text">${match.currentGame(1)}</td>
-                    <td class="table-text">${match.currentGame(1)}</td>
+                    <td class="table-text">${match.setsWonByFirstPlayer}</td>
+                    <td class="table-text">${match.currentGamesFirstPlayer}</td>
+                    <td class="table-text">${match.currentPointsFirstPlayer}</td>
                     <td class="table-text">
                         <div class="action-container">
                         <form action="${pageContext.request.contextPath}/match-score" method="post" class="point-form">
@@ -65,9 +65,9 @@
                 </tr>
                 <tr class="player2">
                     <td class="table-text">${match.secondPlayer}</td>
-                    <td class="table-text">${match.setWon(2)}</td>
-                    <td class="table-text">${match.currentGame(2)}</td>
-                    <td class="table-text">${match.currentGame(2)}</td>
+                    <td class="table-text">${match.setsWonBySecondPlayer}</td>
+                    <td class="table-text">${match.currentGamesSecondPlayer}</td>
+                    <td class="table-text">${match.currentPointsSecondPlayer}</td>
                     <td class="table-text">
                         <div class="action-container">
                          <form action="${pageContext.request.contextPath}/match-score" method="post" class="point-form">
