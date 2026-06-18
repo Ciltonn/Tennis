@@ -16,7 +16,7 @@ public class HibernateUtil {
             sessionFactory = configuration.buildSessionFactory();
         } catch (HibernateException e) {
             log.error("hibernate.cfg.xml could not found or a session could not be created ");
-            throw new RuntimeException(e); //TODO
+            throw new RuntimeException(e);
         }
     }
 

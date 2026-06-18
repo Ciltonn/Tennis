@@ -11,17 +11,11 @@ public final class ValidationUtil {
             Pattern.compile("^[a-zA-Zа-яА-ЯёЁ\\s\\-'.]+$");
 
     public static void validate(PlayerRequestDto playerRequest) {
-        if (playerRequest == null) {
-            throw new InvalidParameterException("Player request cannot be null");
-        }
         if (playerRequest.getFirstPlayer() == null) {
             throw new InvalidParameterException("Missing parameter - name");
         }
         if (playerRequest.getSecondPlayer() == null) {
             throw new InvalidParameterException("Missing parameter - name");
-        }
-        if (playerRequest.getFirstPlayer().length() < 2 || playerRequest.getSecondPlayer().length() > 30) {
-            throw new InvalidParameterException("Player name cannot be less 2 characters and more 30 characters");
         }
         if (!NAME_PATTERN.matcher(playerRequest.getFirstPlayer()).matches()) {
             throw new InvalidParameterException("\"Use only English or Russian letters, spaces, hyphens( - ), apostrophes( ' ), and dots( . )");

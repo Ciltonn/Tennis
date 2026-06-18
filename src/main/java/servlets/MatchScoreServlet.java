@@ -9,22 +9,24 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import service.FinishedMatchesPersistenceService;
+import service.FinishedMatchesPersistenceServiceImpl;
 import service.OngoingMatchService;
+import service.OngoingMatchServiceImpl;
 
 import java.io.IOException;
 import java.util.UUID;
 
 @WebServlet("/match-score")
 public class MatchScoreServlet extends HttpServlet {
-    private OngoingMatchService ongoingMatchService;
-    private FinishedMatchesPersistenceService finishedMatchesPersistenceService;
+    private OngoingMatchServiceImpl ongoingMatchService;
+    private FinishedMatchesPersistenceServiceImpl finishedMatchesPersistenceService;
 
     @Override
     public void init() throws ServletException {
         super.init();
         ServletContext context = getServletContext();
-        this.ongoingMatchService = (OngoingMatchService) context.getAttribute("ongoingMatchService");
-        this.finishedMatchesPersistenceService = (FinishedMatchesPersistenceService) context.getAttribute("finishedMatchesPersistenceService");
+        this.ongoingMatchService = (OngoingMatchServiceImpl) context.getAttribute(OngoingMatchService.class.getName());
+        this.finishedMatchesPersistenceService = (FinishedMatchesPersistenceServiceImpl) context.getAttribute(FinishedMatchesPersistenceService.class.getName());
     }
 
     @Override

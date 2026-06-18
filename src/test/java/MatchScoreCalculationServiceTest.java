@@ -1,31 +1,18 @@
 //import model.CurrentMatch;
-//import model.MatchState;
-//import model.TennisPoint;
-//import entity.Player;
 //import org.junit.jupiter.api.BeforeEach;
 //import org.junit.jupiter.api.DisplayName;
 //import org.junit.jupiter.api.Test;
-//import service.MatchScoreCalculationService;
-//import service.OngoingMatchService;
 //import static org.junit.jupiter.api.Assertions.*;
 //
-//import java.util.UUID;
+//
 //
 //public class MatchScoreCalculationServiceTest {
-//    private MatchScoreCalculationService matchScoreCalculationService;
-//    private OngoingMatchService ongoingMatchService;
-//    private UUID matchId;
-//    private Player player1;
-//    private  Player player2;
+//   private CurrentMatch currentMatch;
 //
 //
 //    @BeforeEach
 //    void setUp() {
-//        player1 = new Player(1L, "Rafael Nadal");
-//        player2 = new Player(2L, "Pete Sampras");
-//        ongoingMatchService = new OngoingMatchService();
-//        matchScoreCalculationService = new MatchScoreCalculationService(ongoingMatchService);
-//        matchId = UUID.randomUUID();
+//       currentMatch = new CurrentMatch()
 //
 //
 //    }
@@ -124,4 +111,4 @@
 //
 //    }
 //}
-
+//

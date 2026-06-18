@@ -3,12 +3,14 @@ package servlets;
 import dao.MatchDaoImpl;
 import dao.PlayerDaoImpl;
 import entity.TennisMatch;
+import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import service.MatchService;
+import service.MatchServiceImpl;
 
 import java.io.IOException;
 import java.util.List;
@@ -18,14 +20,13 @@ import java.util.Optional;
 @WebServlet("/matches")
 public class MatchesServlet extends HttpServlet {
     private static final int PAGE_SIZE = 5;
-    private MatchService matchService;
+    private MatchServiceImpl matchService;
 
     @Override
     public void init() throws ServletException {
         super.init();
-        MatchDaoImpl matchDao = new MatchDaoImpl();
-        PlayerDaoImpl playerDao = new PlayerDaoImpl();
-        this.matchService = new MatchService(matchDao, playerDao);
+        ServletContext context = getServletContext();
+        this.matchService = (MatchServiceImpl) context.getAttribute(MatchService.class.getName());
     }
 
     @Override

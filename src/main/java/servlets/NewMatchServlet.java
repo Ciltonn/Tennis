@@ -10,7 +10,9 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import service.NewMatchService;
+import service.NewMatchServiceImpl;
 import service.OngoingMatchService;
+import service.OngoingMatchServiceImpl;
 
 import java.io.IOException;
 import java.util.UUID;
@@ -18,15 +20,15 @@ import static util.ValidationUtil.validate;
 
 @WebServlet("/new-match")
 public class NewMatchServlet extends HttpServlet {
-    private NewMatchService newMatchService;
-    private OngoingMatchService ongoingMatchService;
+    private NewMatchServiceImpl newMatchService;
+    private OngoingMatchServiceImpl ongoingMatchService;
 
     @Override
     public void init() throws ServletException {
         super.init();
         ServletContext context = getServletContext();
-        this.newMatchService = (NewMatchService) context.getAttribute("newMatchService");
-        this.ongoingMatchService = (OngoingMatchService) context.getAttribute("ongoingMatchService");
+        this.newMatchService = (NewMatchServiceImpl) context.getAttribute(NewMatchService.class.getName());
+        this.ongoingMatchService = (OngoingMatchServiceImpl) context.getAttribute(OngoingMatchService.class.getName());
     }
 
     @Override
