@@ -66,6 +66,10 @@ public class Set {
         }
     }
 
+    public boolean isTieBreak() {
+        return isTieBreak;
+    }
+
     public int getFirstPlayerGames() {
         return firstPlayerGames;
     }

@@ -20,9 +20,9 @@ public class AppContextListener implements ServletContextListener {
     public void contextInitialized(ServletContextEvent servletContextEvent) {
         MatchDaoImpl matchDao = new MatchDaoImpl();
         PlayerDaoImpl playerDao = new PlayerDaoImpl();
-        NewMatchServiceImpl newMatchService = new NewMatchServiceImpl();
-        OngoingMatchServiceImpl ongoingMatchService = new OngoingMatchServiceImpl();
-        FinishedMatchesPersistenceServiceImpl finishedMatchesPersistenceService = new FinishedMatchesPersistenceServiceImpl(playerDao, matchDao);
+        NewMatchService newMatchService = new NewMatchServiceImpl();
+        OngoingMatchService ongoingMatchService = new OngoingMatchServiceImpl();
+        FinishedMatchesPersistenceService finishedMatchesPersistenceService = new FinishedMatchesPersistenceServiceImpl(playerDao, matchDao);
         ServletContext context = servletContextEvent.getServletContext();
         context.setAttribute(MatchDao.class.getName(), matchDao);
         context.setAttribute(PlayerDao.class.getName(), playerDao);

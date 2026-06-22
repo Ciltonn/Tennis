@@ -1,28 +1,27 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+         https://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.example</groupId>
     <artifactId>Tennis</artifactId>
     <packaging>war</packaging>
     <version>1.0-SNAPSHOT</version>
     <name>Tennis Maven Webapp</name>
-    <url>https://maven.apache.org</url>
-
     <properties>
-        <maven.compiler.source>22</maven.compiler.source>
-        <maven.compiler.target>22</maven.compiler.target>
+        <maven.compiler.release>21</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <jakarta.servlet.version>6.2.0-M1</jakarta.servlet.version>
-        <jstl.version>2.0.0</jstl.version>
-        <hibernate.version>8.0.0.Alpha1</hibernate.version>
-        <slf4j.version>2.1.0-alpha1</slf4j.version>
-        <logback.version>1.5.32</logback.version>
-        <h2database.version>2.4.240</h2database.version>
-        <lombok.version>1.18.42</lombok.version>
-        <junit.version>6.1.0-M1</junit.version>
+        <jakarta.servlet.version>6.0.0</jakarta.servlet.version>
+        <jstl.version>3.0.0</jstl.version>
+        <hibernate.version>6.3.1.Final</hibernate.version>
+        <slf4j.version>2.0.9</slf4j.version>
+        <logback.version>1.4.14</logback.version>
+        <h2database.version>2.2.224</h2database.version>
+        <lombok.version>1.18.30</lombok.version>
+        <junit.version>5.10.1</junit.version>
         <jakarta.validation>3.0.2</jakarta.validation>
+        <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
     </properties>
-
     <dependencies>
         <dependency>
             <groupId>jakarta.servlet</groupId>
@@ -31,9 +30,14 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>jakarta.servlet.jsp.jstl</groupId>
+            <artifactId>jakarta.servlet.jsp.jstl-api</artifactId>
+            <version>${jstl.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.glassfish.web</groupId>
             <artifactId>jakarta.servlet.jsp.jstl</artifactId>
-            <version>${jstl.version}</version>
+            <version>3.0.1</version>
         </dependency>
         <dependency>
             <groupId>org.hibernate.orm</groupId>
@@ -59,18 +63,18 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>${lombok.version}</version>
-            <scope>compile</scope>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.validation</groupId>
+            <artifactId>jakarta.validation-api</artifactId>
+            <version>${jakarta.validation}</version>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
             <version>${junit.version}</version>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>jakarta.validation</groupId>
-            <artifactId>jakarta.validation-api</artifactId>
-            <version>${jakarta.validation}</version>
         </dependency>
     </dependencies>
     <build>
@@ -79,10 +83,9 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven-compiler-plugin.version}</version>
                 <configuration>
-                    <source>22</source>
-                    <target>22</target>
-                    <compilerArgs>--enable-preview</compilerArgs>
+                    <release>${maven.compiler.release}</release>
                 </configuration>
             </plugin>
         </plugins>

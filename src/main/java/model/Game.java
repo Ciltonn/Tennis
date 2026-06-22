@@ -11,34 +11,41 @@ public class Game {
 
     public Point addPoint(int player) {
         if (player == 1) {
+            if (secondPlayerPoints == Point.ADVANTAGE) {
+                secondPlayerPoints = Point.FORTY;
+                return firstPlayerPoints;
+            }
             return firstPlayerPoints = firstPlayerPoints.next();
-        } else return secondPlayerPoints = secondPlayerPoints.next();
+        } else {
+            if (firstPlayerPoints == Point.ADVANTAGE) {
+                firstPlayerPoints = Point.FORTY;
+                return secondPlayerPoints;
+            }
+            return secondPlayerPoints = secondPlayerPoints.next();
+        }
     }
 
     public boolean isGameFinished() {
-        int maxOrdinalToLoss = 2;
-        if(firstPlayerPoints==Point.FORTY && secondPlayerPoints.ordinal()<=maxOrdinalToLoss) {
+        int firstPlayerOrdinal = firstPlayerPoints.ordinal();
+        int secondPlayerOrdinal = secondPlayerPoints.ordinal();
+        if (firstPlayerOrdinal >= 4 && firstPlayerOrdinal - secondPlayerOrdinal >= 2) {
             return true;
         }
-        if(secondPlayerPoints==Point.FORTY && firstPlayerPoints.ordinal()<=maxOrdinalToLoss) {
-            return true;
-        }
-        if(firstPlayerPoints == Point.ADVANTAGE && secondPlayerPoints.ordinal()<=maxOrdinalToLoss) {
-            return true;
-        }
-        if(secondPlayerPoints==Point.ADVANTAGE && firstPlayerPoints.ordinal()<=maxOrdinalToLoss) {
+        if (secondPlayerOrdinal >= 4 && secondPlayerOrdinal - firstPlayerOrdinal >= 2) {
             return true;
         }
         return false;
     }
-    public int getWinnerGame(){
-        if(!isGameFinished()) {
+
+    public int getWinnerGame() {
+        if (!isGameFinished()) {
             return 0;
         }
-        if(firstPlayerPoints==Point.ADVANTAGE || firstPlayerPoints==Point.FORTY) {
+        if (firstPlayerPoints == Point.ADVANTAGE || firstPlayerPoints == Point.FORTY) {
             return 1;
         } else return 2;
     }
+
     public String getPointDisplay(int player) {
         Point point = (player == 1) ? firstPlayerPoints : secondPlayerPoints;
         if (firstPlayerPoints == Point.FORTY && secondPlayerPoints == Point.FORTY) {

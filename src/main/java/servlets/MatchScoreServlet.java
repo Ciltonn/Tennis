@@ -9,24 +9,21 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import service.FinishedMatchesPersistenceService;
-import service.FinishedMatchesPersistenceServiceImpl;
 import service.OngoingMatchService;
-import service.OngoingMatchServiceImpl;
-
 import java.io.IOException;
 import java.util.UUID;
 
 @WebServlet("/match-score")
 public class MatchScoreServlet extends HttpServlet {
-    private OngoingMatchServiceImpl ongoingMatchService;
-    private FinishedMatchesPersistenceServiceImpl finishedMatchesPersistenceService;
+    private OngoingMatchService ongoingMatchService;
+    private FinishedMatchesPersistenceService finishedMatchesPersistenceService;
 
     @Override
     public void init() throws ServletException {
         super.init();
         ServletContext context = getServletContext();
-        this.ongoingMatchService = (OngoingMatchServiceImpl) context.getAttribute(OngoingMatchService.class.getName());
-        this.finishedMatchesPersistenceService = (FinishedMatchesPersistenceServiceImpl) context.getAttribute(FinishedMatchesPersistenceService.class.getName());
+        this.ongoingMatchService = (OngoingMatchService) context.getAttribute(OngoingMatchService.class.getName());
+        this.finishedMatchesPersistenceService = (FinishedMatchesPersistenceService) context.getAttribute(FinishedMatchesPersistenceService.class.getName());
     }
 
     @Override
@@ -38,7 +35,7 @@ public class MatchScoreServlet extends HttpServlet {
         UUID uuid = UUID.fromString(matchId);
         CurrentMatch match = ongoingMatchService.getCurrentMatch(uuid);
         setMatchAttributes(request, match);
-        request.getRequestDispatcher("/match-score.jsp").forward(request, response);
+        request.getRequestDispatcher("/WEB-INF/match-score.jsp").forward(request, response);
     }
 
     @Override
@@ -51,7 +48,7 @@ public class MatchScoreServlet extends HttpServlet {
         if (match.isFinished()) {
             finishedMatchesPersistenceService.finishMatch(match);
             setMatchAttributes(request, match);
-            request.getRequestDispatcher("/match-result.jsp").forward(request, response);
+            request.getRequestDispatcher("/WEB-INF/match-result.jsp").forward(request, response);
 
         } else {
             response.sendRedirect(request.getContextPath() + "/match-score?uuid=" + matchId);

@@ -1,7 +1,6 @@
 package servlets;
 
-import dao.MatchDaoImpl;
-import dao.PlayerDaoImpl;
+import dto.MatchDto;
 import entity.TennisMatch;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
@@ -10,8 +9,6 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import service.MatchService;
-import service.MatchServiceImpl;
-
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -20,13 +17,13 @@ import java.util.Optional;
 @WebServlet("/matches")
 public class MatchesServlet extends HttpServlet {
     private static final int PAGE_SIZE = 5;
-    private MatchServiceImpl matchService;
+    private MatchService matchService;
 
     @Override
     public void init() throws ServletException {
         super.init();
         ServletContext context = getServletContext();
-        this.matchService = (MatchServiceImpl) context.getAttribute(MatchService.class.getName());
+        this.matchService = (MatchService) context.getAttribute(MatchService.class.getName());
     }
 
     @Override
@@ -34,7 +31,7 @@ public class MatchesServlet extends HttpServlet {
         int page = Optional.ofNullable(request.getParameter("page")).map(Integer::parseInt).orElse(1) ;
         String filterByPlayerName = request.getParameter("filter_by_player_name");
 
-        List<TennisMatch> matches = matchService.getMatches(filterByPlayerName,page, PAGE_SIZE);
+        List<MatchDto> matches = matchService.getMatches(filterByPlayerName,page, PAGE_SIZE);
         long totalMatches = matchService.getTotalMatchesCount(filterByPlayerName);
         int totalPages = (int) Math.ceil((double) totalMatches/PAGE_SIZE);
         if (totalPages<1) {
@@ -47,7 +44,7 @@ public class MatchesServlet extends HttpServlet {
         request.setAttribute("totalMatches", totalMatches);
         request.setAttribute("filter_by_player_name", filterByPlayerName);
 
-        request.getRequestDispatcher("/matches.jsp").forward(request, response);
+        request.getRequestDispatcher("/WEB-INF/matches.jsp").forward(request, response);
 
 
     }

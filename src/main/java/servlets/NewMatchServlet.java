@@ -10,30 +10,27 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import service.NewMatchService;
-import service.NewMatchServiceImpl;
 import service.OngoingMatchService;
-import service.OngoingMatchServiceImpl;
-
 import java.io.IOException;
 import java.util.UUID;
 import static util.ValidationUtil.validate;
 
 @WebServlet("/new-match")
 public class NewMatchServlet extends HttpServlet {
-    private NewMatchServiceImpl newMatchService;
-    private OngoingMatchServiceImpl ongoingMatchService;
+    private NewMatchService newMatchService;
+    private OngoingMatchService ongoingMatchService;
 
     @Override
     public void init() throws ServletException {
         super.init();
         ServletContext context = getServletContext();
-        this.newMatchService = (NewMatchServiceImpl) context.getAttribute(NewMatchService.class.getName());
-        this.ongoingMatchService = (OngoingMatchServiceImpl) context.getAttribute(OngoingMatchService.class.getName());
+        this.newMatchService = (NewMatchService) context.getAttribute(NewMatchService.class.getName());
+        this.ongoingMatchService = (OngoingMatchService) context.getAttribute(OngoingMatchService.class.getName());
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        request.getRequestDispatcher("new-match.jsp").forward(request, response);
+        request.getRequestDispatcher("/WEB-INF/new-match.jsp").forward(request, response);
     }
 
     @Override
@@ -50,7 +47,7 @@ public class NewMatchServlet extends HttpServlet {
             response.sendRedirect(contextPath + "/match-score?uuid=" + matchId);
         } catch (InvalidParameterException e) {
             request.setAttribute("error", e.getMessage());
-            request.getRequestDispatcher("/new-match.jsp").forward(request, response);
+            request.getRequestDispatcher("/WEB-INF/new-match.jsp").forward(request, response);
         }
     }
 }

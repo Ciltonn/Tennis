@@ -7,7 +7,7 @@ import exception.InvalidParameterException;
 import java.util.regex.Pattern;
 
 public final class ValidationUtil {
-    private static final Pattern NAME_PATTERN =
+      private static final Pattern NAME_PATTERN =
             Pattern.compile("^[a-zA-Zа-яА-ЯёЁ\\s\\-'.]+$");
 
     public static void validate(PlayerRequestDto playerRequest) {
