@@ -68,10 +68,11 @@ public class MatchScoreCalculationServiceTest {
         assertEquals("40", match.getCurrentPointsSecondPlayer());
         assertFalse(match.getCurrentGame().isGameFinished());
     }
+
     @Test
-    @DisplayName("После Дьюса (40-40) выигрыш очка дает преимущество (AD-40)")
+    @DisplayName("После дьюса (40-40) выигрыш очка дает преимущество (AD-40)")
     void fromDeuceToAdvantage() {
-       for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 3; i++) {
             match.awardPointTo(1);
             match.awardPointTo(2);
         }
@@ -80,10 +81,11 @@ public class MatchScoreCalculationServiceTest {
         assertEquals("40", match.getCurrentPointsSecondPlayer());
         assertFalse(match.getCurrentGame().isGameFinished());
     }
+
     @Test
-    @DisplayName("Из Преимущества (AD-40) проигрыш очка возвращает в Дьюс (40-40)")
+    @DisplayName("Из преимущества (AD-40) проигрыш очка возвращает в Дьюс (40-40)")
     void fromAdvantageBackToDeuce() {
-       for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 3; i++) {
             match.awardPointTo(1);
             match.awardPointTo(2);
         }
@@ -95,6 +97,7 @@ public class MatchScoreCalculationServiceTest {
         assertEquals("40", match.getCurrentPointsSecondPlayer());
         assertFalse(match.getCurrentGame().isGameFinished());
     }
+
     @Test
     @DisplayName("При счете 6-6 в сете начинается тай-брейк")
     void startTieBreak() {
@@ -102,16 +105,46 @@ public class MatchScoreCalculationServiceTest {
             for (int point = 0; point < 4; point++) {
                 match.awardPointTo(1);
             }
-        }
-        for (int game = 0; game < 6; game++) {
             for (int point = 0; point < 4; point++) {
                 match.awardPointTo(2);
             }
         }
         assertEquals(6, match.getCurrentGamesFirstPlayer());
         assertEquals(6, match.getCurrentGamesSecondPlayer());
-        Set currentSet = match.getSets().get(match.getSets().size()-1);
+        Set currentSet = match.getSets().get(match.getSets().size() - 1);
         assertTrue(currentSet.isTieBreak());
+    }
+
+    @Test
+    @DisplayName("Матч завершается при выигрыше 2 сетов")
+    void matchFinishedAfter2Sets() {
+        for (int i = 0; i < 6; i++) {
+            for (int point = 0; point < 4; point++) {
+                match.awardPointTo(1);
+            }
+        }
+        for (int i = 0; i < 4; i++) {
+            for (int point = 0; point < 4; point++) {
+                match.awardPointTo(2);
+            }
+        }
+        assertFalse(match.isMatchFinished());
+        assertEquals(1, match.getSetsWonByFirstPlayer());
+        assertEquals(0, match.getSetsWonBySecondPlayer());
+        for (int i = 0; i < 6; i++) {
+            for (int point = 0; point < 4; point++) {
+                match.awardPointTo(1);
+            }
+        }
+        for (int i = 0; i < 4; i++) {
+            for (int point = 0; point < 4; point++) {
+                match.awardPointTo(2);
+            }
+        }
+        assertTrue(match.isMatchFinished());
+        assertEquals("FirstPlayer", match.getWinner());
+        assertEquals(2, match.getSetsWonByFirstPlayer());
+        assertEquals(0, match.getSetsWonBySecondPlayer());
     }
 }
 

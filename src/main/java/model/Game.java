@@ -1,56 +1,93 @@
 package model;
 
+import lombok.Getter;
+
+@Getter
 public class Game {
     private Point firstPlayerPoints;
     private Point secondPlayerPoints;
+    private boolean finished;
 
     public Game() {
         this.firstPlayerPoints = Point.ZERO;
         this.secondPlayerPoints = Point.ZERO;
+        this.finished = false;
     }
 
     public Point addPoint(int player) {
+        if (firstPlayerPoints == Point.ADVANTAGE || secondPlayerPoints == Point.ADVANTAGE) {
+            return advantageGame(player);
+        }
+        return regularGame(player);
+    }
+
+    protected Point advantageGame(int player) {
         if (player == 1) {
-            if (secondPlayerPoints == Point.ADVANTAGE) {
-                secondPlayerPoints = Point.FORTY;
+            if (firstPlayerPoints == Point.ADVANTAGE) {
+                finished = true;
                 return firstPlayerPoints;
             }
-            return firstPlayerPoints = firstPlayerPoints.next();
-        } else {
-            if (firstPlayerPoints == Point.ADVANTAGE) {
-                firstPlayerPoints = Point.FORTY;
+            if (secondPlayerPoints == Point.ADVANTAGE) {
+                returnDeuce();
                 return secondPlayerPoints;
             }
-            return secondPlayerPoints = secondPlayerPoints.next();
+        } else {
+            if (secondPlayerPoints == Point.ADVANTAGE) {
+                finished = true;
+                return secondPlayerPoints;
+            }
+            if (firstPlayerPoints == Point.ADVANTAGE) {
+                returnDeuce();
+                return firstPlayerPoints;
+            }
         }
+        throw new IllegalStateException("Unexpected state in advantageGame");
+    }
+
+    protected Point regularGame(int player) {
+        if (player == 1) {
+            if (firstPlayerPoints == Point.FORTY) {
+                if (secondPlayerPoints == Point.FORTY) {
+                    firstPlayerPoints = Point.ADVANTAGE;
+                    return firstPlayerPoints;
+                }
+                finished = true;
+                return firstPlayerPoints;
+            }
+            firstPlayerPoints = firstPlayerPoints.next();
+            return firstPlayerPoints;
+        } else {
+            if (secondPlayerPoints == Point.FORTY) {
+                if (firstPlayerPoints == Point.FORTY) {
+                    secondPlayerPoints = Point.ADVANTAGE;
+                    return secondPlayerPoints;
+                }
+                finished = true;
+                return secondPlayerPoints;
+            }
+            secondPlayerPoints = secondPlayerPoints.next();
+            return secondPlayerPoints;
+        }
+    }
+
+    protected void returnDeuce() {
+        firstPlayerPoints = Point.FORTY;
+        secondPlayerPoints = Point.FORTY;
+        finished = false;
     }
 
     public boolean isGameFinished() {
-        int firstPlayerOrdinal = firstPlayerPoints.ordinal();
-        int secondPlayerOrdinal = secondPlayerPoints.ordinal();
-        if (firstPlayerOrdinal >= 4 && firstPlayerOrdinal - secondPlayerOrdinal >= 2) {
-            return true;
-        }
-        if (secondPlayerOrdinal >= 4 && secondPlayerOrdinal - firstPlayerOrdinal >= 2) {
-            return true;
-        }
-        return false;
+        return finished;
     }
 
     public int getWinnerGame() {
-        if (!isGameFinished()) {
+        if (!finished) {
             return 0;
         }
-        if (firstPlayerPoints == Point.ADVANTAGE || firstPlayerPoints == Point.FORTY) {
+        if (firstPlayerPoints == Point.FORTY || firstPlayerPoints == Point.ADVANTAGE) {
             return 1;
-        } else return 2;
-    }
-
-    public String getPointDisplay(int player) {
-        Point point = (player == 1) ? firstPlayerPoints : secondPlayerPoints;
-        if (firstPlayerPoints == Point.FORTY && secondPlayerPoints == Point.FORTY) {
-            return "40";
+        } else {
+            return 2;
         }
-        return point.getValue();
     }
 }

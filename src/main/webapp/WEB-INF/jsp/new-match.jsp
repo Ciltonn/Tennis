@@ -1,12 +1,11 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page isELIgnored="false" %>
-<!DOCTYPE html>
-<html lang="en">
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tennis Scoreboard | Home</title>
+    <title>Tennis Scoreboard | New Match</title>
     <script>
         (function() {
             if ('serviceWorker' in navigator) {
@@ -21,16 +20,16 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
 
-    <script src="../js/app.js"></script>
+    <script src="${pageContext.request.contextPath}/js/app.js"></script>
 </head>
 <body>
 <header class="header">
     <section class="nav-header">
         <div class="brand">
             <div class="nav-toggle">
-                <img src="../images/menu.png" alt="Logo" class="logo">
+                <img src="../../images/menu.png" alt="Logo" class="logo">
             </div>
             <span class="logo-text">TennisScoreboard</span>
         </div>
@@ -44,20 +43,26 @@
 </header>
 <main>
     <div class="container">
-        <h1>Welcome to Tennis Scoreboard</h1>
-        <p>Manage your tennis matches, record results, and track rankings</p>
-        <div class="welcome-image"></div>
-        <div class="form-container center">
-            <a class="homepage-action-button" href="new-match">
-                <button class="btn start-match">
-                    Start a new match
-                </button>
-            </a>
-            <a class="homepage-action-button" href="matches">
-                <button class="btn view-results">
-                    View match results
-                </button>
-            </a>
+        <div>
+            <h1>Start new match</h1>
+            <div class="new-match-image"></div>
+            <div class="form-container center">
+
+                <form method="post" action="new-match">
+                    <p style="color: red;">${error}</p>
+                    <label class="label-player" for="firstPlayer">Player one</label>
+                    <input class="input-player"
+                           id="firstPlayer" name="firstPlayer" placeholder="name" type="text" required title="Enter a name"
+                           value="${param.firstPlayer}">
+
+
+                    <label class="label-player" for="secondPlayer">Player two</label>
+                    <input class="input-player" placeholder="name" type="text"
+                           id="secondPlayer" name="secondPlayer" required title="Enter a name"
+                           value="${param.secondPlayer}">
+                    <input class="form-button" type="submit" value="Start">
+                </form>
+            </div>
         </div>
     </div>
 </main>

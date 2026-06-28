@@ -30,7 +30,7 @@ public class NewMatchServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        request.getRequestDispatcher("/WEB-INF/new-match.jsp").forward(request, response);
+        request.getRequestDispatcher("/WEB-INF/jsp/new-match.jsp").forward(request, response);
     }
 
     @Override
@@ -47,7 +47,7 @@ public class NewMatchServlet extends HttpServlet {
             response.sendRedirect(contextPath + "/match-score?uuid=" + matchId);
         } catch (InvalidParameterException e) {
             request.setAttribute("error", e.getMessage());
-            request.getRequestDispatcher("/WEB-INF/new-match.jsp").forward(request, response);
+            request.getRequestDispatcher("/WEB-INF/jsp/new-match.jsp").forward(request, response);
         }
     }
 }

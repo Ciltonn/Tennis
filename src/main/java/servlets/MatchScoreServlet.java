@@ -35,7 +35,7 @@ public class MatchScoreServlet extends HttpServlet {
         UUID uuid = UUID.fromString(matchId);
         CurrentMatch match = ongoingMatchService.getCurrentMatch(uuid);
         setMatchAttributes(request, match);
-        request.getRequestDispatcher("/WEB-INF/match-score.jsp").forward(request, response);
+        request.getRequestDispatcher("/WEB-INF/jsp/match-score.jsp").forward(request, response);
     }
 
     @Override
@@ -48,7 +48,7 @@ public class MatchScoreServlet extends HttpServlet {
         if (match.isFinished()) {
             finishedMatchesPersistenceService.finishMatch(match);
             setMatchAttributes(request, match);
-            request.getRequestDispatcher("/WEB-INF/match-result.jsp").forward(request, response);
+            request.getRequestDispatcher("/WEB-INF/jsp/match-result.jsp").forward(request, response);
 
         } else {
             response.sendRedirect(request.getContextPath() + "/match-score?uuid=" + matchId);

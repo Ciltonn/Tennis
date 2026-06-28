@@ -9,8 +9,11 @@ public class TieBreakScore {
         this.secondPlayerScore = 0;
     }
      public boolean addPoint(int player) {
-        if (player == 1) firstPlayerScore++;
-        else secondPlayerScore++;
+        if (player == 1) {
+            firstPlayerScore++;
+        } else {
+            secondPlayerScore++;
+        }
         return isFinished();
     }
 

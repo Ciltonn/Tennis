@@ -2,6 +2,7 @@ package model;
 
 
 import lombok.*;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -35,15 +36,16 @@ public class CurrentMatch {
             return;
         }
         if (sets.isEmpty()) {
-            sets.add(new Set(0,0));
+            sets.add(new Set(0, 0));
         }
         currentGame.addPoint(playerNumber);
         if (currentGame.isGameFinished()) {
             int gameWinner = currentGame.getWinnerGame();
             Set currentSet = sets.get(sets.size() - 1);
-            currentSet.addGame(gameWinner);
+            boolean setFinished = currentSet.addGame(gameWinner);
             currentGame = new Game();
-            if (currentSet.isSetFinished()) {
+
+            if (setFinished) {
                 int firstWon = 0;
                 int secondWon = 0;
                 for (Set set : sets) {
@@ -62,11 +64,12 @@ public class CurrentMatch {
                     isFinished = true;
                     winner = secondPlayer;
                 } else {
-                    sets.add(new Set(0,0));
+                    sets.add(new Set(0, 0));
                 }
             }
         }
     }
+
     public boolean isMatchFinished() {
         return isFinished;
     }
@@ -103,11 +106,11 @@ public class CurrentMatch {
     }
 
     public String getCurrentPointsFirstPlayer() {
-        return currentGame.getPointDisplay(1);
+        return currentGame.getFirstPlayerPoints().getValue();
     }
 
     public String getCurrentPointsSecondPlayer() {
-        return currentGame.getPointDisplay(2);
+        return currentGame.getSecondPlayerPoints().getValue();
     }
 }
 

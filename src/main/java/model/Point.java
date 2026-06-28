@@ -23,6 +23,6 @@ public enum Point {
             case ADVANTAGE -> throw new IllegalStateException("Has not next value for ADVANTAGE");
         };
     }
-}
+  }
 
 

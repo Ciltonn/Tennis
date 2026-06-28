@@ -1,5 +1,8 @@
 package model;
 
+import lombok.Getter;
+
+@Getter
 public class Set {
     private int firstPlayerGames;
     private int secondPlayersGames;
@@ -13,7 +16,7 @@ public class Set {
         this.tieBreakScore = null;
     }
 
-        public boolean addGame(int player) {
+    public boolean addGame(int player) {
         if (isTieBreak) {
             boolean finished = tieBreakScore.addPoint(player);
             if (finished) {
@@ -33,12 +36,16 @@ public class Set {
         } else {
             secondPlayersGames++;
         }
-        updateTieBreak();
+        if (firstPlayerGames == 6 && secondPlayersGames == 6) {
+            isTieBreak = true;
+            tieBreakScore = new TieBreakScore();
+            return false;
+        }
         return isSetFinished();
     }
 
     public boolean isSetFinished() {
-        if (firstPlayerGames == 6 && secondPlayersGames == 6) {
+        if (isTieBreak) {
             return false;
         }
         if (firstPlayerGames >= 6 && firstPlayerGames - secondPlayersGames >= 2) {
@@ -58,23 +65,4 @@ public class Set {
             return 1;
         } else return 2;
     }
-
-    private void updateTieBreak() {
-        if (firstPlayerGames == 6 && secondPlayersGames == 6 && !isTieBreak) {
-            isTieBreak = true;
-            tieBreakScore = new TieBreakScore();
-        }
-    }
-
-    public boolean isTieBreak() {
-        return isTieBreak;
-    }
-
-    public int getFirstPlayerGames() {
-        return firstPlayerGames;
-    }
-
-    public int getSecondPlayersGames() {
-        return secondPlayersGames;
-    }
-}
+   }

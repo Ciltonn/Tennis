@@ -44,7 +44,7 @@ public class MatchesServlet extends HttpServlet {
         request.setAttribute("totalMatches", totalMatches);
         request.setAttribute("filter_by_player_name", filterByPlayerName);
 
-        request.getRequestDispatcher("/WEB-INF/matches.jsp").forward(request, response);
+        request.getRequestDispatcher("/WEB-INF/jsp/matches.jsp").forward(request, response);
 
 
     }
